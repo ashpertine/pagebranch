@@ -1,4 +1,5 @@
 import { Client } from "pg";
+import { connectionString } from "./pool.js";
 
 const SQL = `
   CREATE TABLE IF NOT EXISTS users (
