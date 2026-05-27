@@ -13,6 +13,7 @@ const SQL = `
   CREATE TABLE IF NOT EXISTS stories (
       id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
       author_id INTEGER NOT NULL,
+      story_title VARCHAR(255) NOT NULL,
       start_passage_id INTEGER,
       updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
       created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
