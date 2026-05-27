@@ -12,15 +12,17 @@ const verifyCallback = async (username, password, done) => {
 
     const user = rows[0];
     if (!user) {
-      done(null, false, { message: "Incorrect username or password." });
+      return done(null, false, { message: "Incorrect username or password." });
     } else {
       const match = await validPassword(password, user.password);
       if (!match)
-        done(null, false, { message: "Incorrect username or password." });
-      else done(null, user);
+        return done(null, false, {
+          message: "Incorrect username or password.",
+        });
+      else return done(null, user);
     }
   } catch (error) {
-    done(error);
+    return done(error);
   }
 };
 
@@ -38,11 +40,11 @@ passport.deserializeUser(async (id, done) => {
     const user = rows[0];
 
     if (!user) {
-      done(null, false);
+      return done(null, false);
     } else {
-      done(null, user);
+      return done(null, user);
     }
   } catch (error) {
-    done(error);
+    return done(error);
   }
 });

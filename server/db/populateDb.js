@@ -4,7 +4,7 @@ import { connectionString } from "./pool.js";
 const SQL = `
   CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    email VARCHAR(255) NOT NULL,
+    username VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,
     first_name VARCHAR(255),
     last_name VARCHAR(255)
@@ -65,8 +65,6 @@ const SQL = `
 
   CREATE INDEX "IDX_session_expire" ON "session" ("expire");
 `;
-
-const connectionString = `postgres://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`;
 
 const client = new Client({
   connectionString,
