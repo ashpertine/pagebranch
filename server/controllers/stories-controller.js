@@ -1,4 +1,4 @@
-import storiesQueries from "../queries/storiesQueries.js";
+import storiesQueries from "../queries/stories-queries.js";
 
 async function getUserStories(req, res) {
   try {

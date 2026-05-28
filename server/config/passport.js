@@ -1,7 +1,7 @@
 import passport from "passport";
 import LocalStrategy from "passport-local";
 import { pbPool } from "../db/pool.js";
-import { validPassword } from "../utils/passwordUtils.js";
+import { validPassword } from "../utils/password-utils.js";
 
 const verifyCallback = async (username, password, done) => {
   try {

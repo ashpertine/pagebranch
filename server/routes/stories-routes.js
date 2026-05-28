@@ -1,5 +1,5 @@
-import storiesController from "../controllers/storiesController.js";
-import { checkAuthenticated } from "../middleware/authHelper.js";
+import storiesController from "../controllers/stories-controller.js";
+import { checkAuthenticated } from "../middleware/auth-helper.js";
 import { Router } from "express";
 
 const storiesRouter = Router();

@@ -3,8 +3,8 @@ import session from "express-session";
 import PGSimple from "connect-pg-simple";
 import { pbPool } from "./db/pool.js";
 import passport from "passport";
-import { authRouter } from "./routes/authRoutes.js";
-import { storiesRouter } from "./routes/storiesRoutes.js";
+import { authRouter } from "./routes/auth-routes.js";
+import { storiesRouter } from "./routes/stories-routes.js";
 
 const pgSession = PGSimple(session);
 const app = express();

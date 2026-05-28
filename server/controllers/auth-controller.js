@@ -1,4 +1,4 @@
-import authQueries from "../queries/authQueries.js";
+import authQueries from "../queries/auth-queries.js";
 
 async function registerNewUserPost(req, res) {
   try {

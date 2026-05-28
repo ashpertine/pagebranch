@@ -1,5 +1,5 @@
 import { pbPool } from "../db/pool.js";
-import { genPassword } from "../utils/passwordUtils.js";
+import { genPassword } from "../utils/password-utils.js";
 
 async function insertNewUser(username, password) {
   const hashed = await genPassword(password);
