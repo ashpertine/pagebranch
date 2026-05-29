@@ -1,8 +1,13 @@
 import storiesController from "../controllers/stories-controller.js";
+import storyContentController from "../controllers/story-content-controller.js";
 import { checkAuthenticated } from "../middleware/auth-helper.js";
 import { Router } from "express";
 
 const storiesRouter = Router();
+
+/*
+ * STORIES
+ */
 
 storiesRouter.get(
   "/stories",
@@ -16,7 +21,7 @@ storiesRouter.post(
   storiesController.postNewStory,
 );
 
-storiesRouter.put(
+storiesRouter.patch(
   "/stories/:storyId/update",
   checkAuthenticated,
   storiesController.updateStory,
@@ -26,6 +31,58 @@ storiesRouter.delete(
   "/stories/:storyId/delete",
   checkAuthenticated,
   storiesController.deleteStory,
+);
+
+/*
+ * STORY CONTENT
+ */
+
+storiesRouter.patch(
+  "/stories/:storyId/update-start/",
+  checkAuthenticated,
+  storyContentController.updateStartPassage,
+);
+
+storiesRouter.get(
+  "/stories/:storyId",
+  checkAuthenticated,
+  storyContentController.getStoryContent,
+);
+
+storiesRouter.post(
+  "/stories/:storyId/passage/new",
+  checkAuthenticated,
+  storyContentController.newPassagePost,
+);
+
+storiesRouter.patch(
+  "/stories/:storyId/passage/:passageId/update",
+  checkAuthenticated,
+  storyContentController.updatePassage,
+);
+
+storiesRouter.delete(
+  "/stories/:storyId/passage/:passageId/delete",
+  checkAuthenticated,
+  storyContentController.deletePassage,
+);
+
+storiesRouter.post(
+  "/stories/:storyId/choice/new",
+  checkAuthenticated,
+  storyContentController.newChoicePost,
+);
+
+storiesRouter.patch(
+  "/stories/:storyId/choice/:choiceId/update",
+  checkAuthenticated,
+  storyContentController.updateChoice,
+);
+
+storiesRouter.delete(
+  "/stories/:storyId/choice/:choiceId/delete",
+  checkAuthenticated,
+  storyContentController.deleteChoice,
 );
 
 export { storiesRouter };
