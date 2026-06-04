@@ -1,15 +1,9 @@
 import { pbPool } from "../db/pool.js";
+import { storyOwnerCheck } from "./role-queries.js";
 
 async function setStartPassage(user_id, story_id, passage_id) {
-  const isOwner = await pbPool.query(
-    "SELECT COUNT(*) > 1 as valid from stories WHERE author_id = $1 AND id = $2",
-    [user_id, story_id],
-  );
-  if (!isOwner) {
-    // user does not own story
-    return null;
-  }
-
+  const isOwner = await storyOwnerCheck(user_id, story_id);
+  if (!isOwner) return null;
   const SQL = `
     UPDATE stories SET start_passage_id = $1, updated_at = now()
     WHERE author_id = $2 AND id = $3 AND 
@@ -27,7 +21,7 @@ async function getPassagesByStoryId(user_id, story_id) {
   const SQL = `
     SELECT passages.* FROM passages
     INNER JOIN stories ON passages.story_id = stories.id
-    WHERE stories.author_id = $1 AND passages.story_id $2 
+    WHERE stories.author_id = $1 AND passages.story_id = $2 
   `;
 
   const { rows } = await pbPool.query(SQL, [user_id, story_id]);
@@ -35,14 +29,8 @@ async function getPassagesByStoryId(user_id, story_id) {
 }
 
 async function insertNewPassage(user_id, story_id, title, description) {
-  const isOwner = await pbPool.query(
-    "SELECT COUNT(*) > 1 as valid from stories WHERE author_id = $1 AND id = $2",
-    [user_id, story_id],
-  );
-  if (!isOwner) {
-    // user does not own story
-    return null;
-  }
+  const isOwner = await storyOwnerCheck(user_id, story_id);
+  if (!isOwner) return null;
 
   const SQL = `INSERT into passages (story_id, title, description ) VALUES ($1, $2, $3) RETURNING *`;
   const { rows } = await pbPool.query(SQL, [story_id, title, description]);
@@ -56,14 +44,8 @@ async function updatePassageById(
   title,
   description,
 ) {
-  const isOwner = await pbPool.query(
-    "SELECT COUNT(*) > 1 as valid from stories WHERE author_id = $1 AND id = $2",
-    [user_id, story_id],
-  );
-  if (!isOwner) {
-    // user does not own story
-    return null;
-  }
+  const isOwner = await storyOwnerCheck(user_id, story_id);
+  if (!isOwner) return null;
 
   const SQL = `
     UPDATE passages SET title = $1, description = $2
@@ -82,14 +64,8 @@ async function updatePassageById(
 }
 
 async function deletePassageById(user_id, story_id, passage_id) {
-  const isOwner = await pbPool.query(
-    "SELECT COUNT(*) > 1 as valid from stories WHERE author_id = $1 AND id = $2",
-    [user_id, story_id],
-  );
-  if (!isOwner) {
-    // user does not own story
-    return null;
-  }
+  const isOwner = await storyOwnerCheck(user_id, story_id);
+  if (!isOwner) return null;
 
   const SQL = `
     DELETE FROM passages
@@ -97,7 +73,7 @@ async function deletePassageById(user_id, story_id, passage_id) {
     RETURNING passages.*
   `;
 
-  const { rows } = pbPool.query(SQL, [user_id, passage_id]);
+  const { rows } = await pbPool.query(SQL, [user_id, passage_id]);
   return rows;
 }
 
@@ -114,14 +90,8 @@ async function getChoicesByStoryId(user_id, story_id) {
 }
 
 async function getChoiceById(user_id, story_id, choice_id) {
-  const isOwner = await pbPool.query(
-    "SELECT COUNT(*) > 1 as valid from stories WHERE author_id = $1 AND id = $2",
-    [user_id, story_id],
-  );
-  if (!isOwner) {
-    // user does not own story
-    return null;
-  }
+  const isOwner = await storyOwnerCheck(user_id, story_id);
+  if (!isOwner) return null;
 
   const SQL = `
     SELECT * FROM choices WHERE id = $1
@@ -138,13 +108,20 @@ async function insertNewChoice(
   from_passage_id,
   to_passage_id,
 ) {
-  const isOwner = await pbPool.query(
-    "SELECT COUNT(*) > 1 as valid from stories WHERE author_id = $1 AND id = $2",
-    [user_id, story_id],
-  );
-  if (!isOwner) {
-    // user does not own story
-    return null;
+  const isOwner = await storyOwnerCheck(user_id, story_id);
+  if (!isOwner) return null;
+
+  const choiceExists = (
+    await pbPool.query(
+      `SELECT COUNT(*) > 0 as exists FROM choices WHERE from_passage_id = $1 AND to_passage_id = $2`,
+      [from_passage_id, to_passage_id],
+    )
+  ).rows[0].exists;
+
+  if (choiceExists) {
+    return {
+      queryError: `choice between passage ${from_passage_id} and ${to_passage_id} already exists`,
+    };
   }
 
   const SQL = `
@@ -167,14 +144,29 @@ async function updateChoiceById(
   from_passage_id,
   to_passage_id,
 ) {
-  const isOwner = await pbPool.query(
-    "SELECT COUNT(*) > 1 as valid from stories WHERE author_id = $1 AND id = $2",
-    [user_id, story_id],
+  const isOwner = await storyOwnerCheck(user_id, story_id);
+  if (!isOwner) return null;
+
+  const choiceExists = (
+    await pbPool.query(
+      `SELECT COUNT(*) > 0 as exists FROM choices WHERE from_passage_id = $1 AND to_passage_id = $2`,
+      [from_passage_id, to_passage_id],
+    )
+  ).rows[0].exists;
+
+  const currentChoice = await pbPool.query(
+    `SELECT from_passage_id, to_passage_id FROM choices WHERE id = $1`,
+    [choice_id],
   );
 
-  if (!isOwner) {
-    // user does not own story
-    return null;
+  const samePassages =
+    Number(currentChoice.rows[0].from_passage_id) === Number(from_passage_id) &&
+    Number(currentChoice.rows[0].to_passage_id) === Number(to_passage_id);
+
+  if (choiceExists && !samePassages) {
+    return {
+      queryError: `choice between passage ${from_passage_id} and ${to_passage_id} already exists`,
+    };
   }
 
   const SQL = `
@@ -189,18 +181,13 @@ async function updateChoiceById(
     to_passage_id,
     choice_id,
   ]);
+
+  return rows;
 }
 
 async function deleteChoiceById(user_id, story_id, choice_id) {
-  const isOwner = await pbPool.query(
-    "SELECT COUNT(*) > 1 as valid from stories WHERE author_id = $1 AND id = $2",
-    [user_id, story_id],
-  );
-
-  if (!isOwner) {
-    // user does not own story
-    return null;
-  }
+  const isOwner = await storyOwnerCheck(user_id, story_id);
+  if (!isOwner) return null;
 
   const SQL = `
     DELETE FROM choices WHERE id = $1 RETURNING *

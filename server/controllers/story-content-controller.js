@@ -44,11 +44,11 @@ async function getStoryContent(req, res) {
     const userId = req.session.passport.user;
     const storyId = req.params.storyId;
 
-    const passagesResults = storyContentQueries.getPassagesByStoryId(
+    const passagesResults = await storyContentQueries.getPassagesByStoryId(
       userId,
       storyId,
     );
-    const choicesResults = storyContentQueries.getChoicesByStoryId(
+    const choicesResults = await storyContentQueries.getChoicesByStoryId(
       userId,
       storyId,
     );
@@ -65,7 +65,7 @@ async function getStoryContent(req, res) {
   }
 }
 
-async function newPassagePost(req, res) {
+async function postNewPassage(req, res) {
   try {
     const userId = req.session.passport.user;
     const storyId = req.params.storyId;
@@ -153,7 +153,7 @@ async function deletePassage(req, res) {
   }
 }
 
-async function newChoicePost(req, res) {
+async function postNewChoice(req, res) {
   try {
     const userId = req.session.passport.user;
     const storyId = req.params.storyId;
@@ -172,9 +172,25 @@ async function newChoicePost(req, res) {
       to_passage_id,
     );
 
+    if (results === null) {
+      return res.status(404).json({
+        errorMsg: "Choice not found",
+      });
+    } else if (results.queryError) {
+      return res.status(400).json({
+        errorMsg: results.queryError,
+      });
+    }
+
     return res.status(200).json(results);
   } catch (error) {
     console.error(error);
+    if (error.code === "23503") {
+      // foreign_key_violation
+      return res
+        .status(400)
+        .json({ errorMsg: "referenced passage does not exist" });
+    }
     return res.status(500).json({
       errorMsg: error.toString(),
     });
@@ -194,7 +210,7 @@ async function updateChoice(req, res) {
       });
     }
 
-    const results = storyContentQueries.updateChoiceById(
+    const results = await storyContentQueries.updateChoiceById(
       userId,
       storyId,
       choiceId,
@@ -207,11 +223,21 @@ async function updateChoice(req, res) {
       return res.status(404).json({
         errorMsg: "Choice not found",
       });
+    } else if (results.queryError) {
+      return res.status(400).json({
+        errorMsg: results.queryError,
+      });
     }
 
     return res.status(200).json(results);
   } catch (error) {
     console.error(error);
+    if (error.code === "23503") {
+      // foreign_key_violation
+      return res
+        .status(400)
+        .json({ errorMsg: "referenced passage does not exist" });
+    }
     return res.status(500).json({
       errorMsg: error.toString(),
     });
@@ -224,12 +250,13 @@ async function deleteChoice(req, res) {
     const storyId = req.params.storyId;
     const choiceId = req.params.choiceId;
 
-    const results = storyContentQueries.deleteChoiceById(
+    const results = await storyContentQueries.deleteChoiceById(
       userId,
       storyId,
       choiceId,
     );
-    if (results === null) {
+
+    if (results === null || results.length === 0) {
       return res.status(404).json({
         errorMsg: "Choice not found",
       });
@@ -247,10 +274,10 @@ async function deleteChoice(req, res) {
 export default {
   updateStartPassage,
   getStoryContent,
-  newPassagePost,
+  postNewPassage,
   updatePassage,
   deletePassage,
-  newChoicePost,
+  postNewChoice,
   updateChoice,
   deleteChoice,
 };

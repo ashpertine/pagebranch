@@ -52,7 +52,7 @@ storiesRouter.get(
 storiesRouter.post(
   "/stories/:storyId/passage/new",
   checkAuthenticated,
-  storyContentController.newPassagePost,
+  storyContentController.postNewPassage,
 );
 
 storiesRouter.patch(
@@ -70,7 +70,7 @@ storiesRouter.delete(
 storiesRouter.post(
   "/stories/:storyId/choice/new",
   checkAuthenticated,
-  storyContentController.newChoicePost,
+  storyContentController.postNewChoice,
 );
 
 storiesRouter.patch(
