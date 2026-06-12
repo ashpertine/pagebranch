@@ -5,13 +5,21 @@ import { pbPool } from "./db/pool.js";
 import passport from "passport";
 import { authRouter } from "./routes/auth-routes.js";
 import { storiesRouter } from "./routes/stories-routes.js";
+import cors from "cors";
 
 const pgSession = PGSimple(session);
 const app = express();
 const PORT = 3000;
+const allowedOrigin = process.env.CLIENT_URL || "http://localhost:5173";
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+app.use(
+  cors({
+    origin: allowedOrigin,
+  }),
+);
+
 app.use(
   session({
     name: "pb.sid",

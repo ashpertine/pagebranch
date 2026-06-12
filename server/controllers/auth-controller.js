@@ -1,23 +1,39 @@
 import authQueries from "../queries/auth-queries.js";
+import { validationResult, matchedData } from "express-validator";
 
 async function registerNewUserPost(req, res) {
   try {
-    const { username, password } = req.body;
-    if (!username || !password) {
+    const result = validationResult(req);
+    if (!result.isEmpty()) {
+      //handle errors
+      const errors = result.mapped();
       return res.status(400).json({
-        errorMsg: "username and/or password is undefined!",
+        errorMsg: Object.fromEntries(
+          Object.entries(errors).map(([errorField, errorValue]) => [
+            errorField,
+            errorValue.msg,
+          ]),
+        ),
+      });
+    }
+
+    const { username, password, confirmPassword } = matchedData(req);
+
+    if (password !== confirmPassword) {
+      return res.status(400).json({
+        errorMsg: { global: "Your passwords do not match!" },
       });
     }
     const results = await authQueries.getUserByUsername(username);
     if (results.length > 0) {
       return res.status(409).json({
-        errorMsg: "username already exists!",
+        errorMsg: { global: "Username already exists!" },
       });
     }
 
     await authQueries.insertNewUser(username, password);
     return res.status(200).json({
-      okMsg: "register successful",
+      okMsg: { global: "Register successful" },
     });
   } catch (error) {
     console.error(error);
