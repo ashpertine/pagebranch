@@ -2,10 +2,10 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { useFlash } from "./useFlash.js";
 
-const router = useRouter();
-const { setFlash } = useFlash();
-
 export function useRegisterForm() {
+  const router = useRouter();
+  const { setFlash } = useFlash();
+
   async function createRegisterRequest(username, password, confirmPassword) {
     const response = await fetch("/api/register", {
       method: "POST",
@@ -25,6 +25,7 @@ export function useRegisterForm() {
         password.value,
         confirmPassword.value,
       );
+
       if (!response.ok) {
         const responseErrorMsg = (await response.json()).errorMsg;
         if ([400, 409].includes(Number(response.status))) {
@@ -36,10 +37,7 @@ export function useRegisterForm() {
         }
       } else {
         // handle ok response
-        setFlash({
-          type: "success",
-          message: "Registration Successful! Please login.",
-        });
+        setFlash("success", "Registration Successful! Please login.");
         router.replace({ path: "/login" });
       }
     } catch (error) {
@@ -59,6 +57,7 @@ export function useRegisterForm() {
   });
 
   return {
+    router,
     username,
     password,
     confirmPassword,
