@@ -1,18 +1,18 @@
 <script setup>
-  import { useRegisterForm } from '../composables/useRegisterForm.js';
-  const { formMapping, validateField, errorMsgs, submitRegister } = useRegisterForm()
+  import { useLoginForm } from '../composables/useLoginForm.js';
+  const { formMapping, errorMsgs, validateField, submitLogin } = useLoginForm()
 
   async function verifyAndSubmit() {
     for(const value of Object.keys(errorMsgs.value).filter(el => el !== "global")) {
         const error = validateField(formMapping.value[value], value);
         if(error) return;
     }
- 
-    await submitRegister();
+    
+    await submitLogin();
   }
 </script>
 <template>
-  <div class="register-box">
+  <div class="login-box">
     <form @input="errorMsgs.global = ''">
       <span class="error-msg global" v-if="errorMsgs.global.length !== 0">{{ errorMsgs.global }}</span>
       <div class="form-field">
@@ -25,17 +25,12 @@
         <input type="password" id="password" name="password" v-model="formMapping.password" @input="validateField(formMapping.password, 'password')" :class="{'input-error': errorMsgs.password.length !== 0}">
         <span class="error-msg" v-if="errorMsgs.password.length !== 0">{{ errorMsgs.password }}</span>
       </div>
-      <div class="form-field">
-        <label for="confirm-password">Confirm Password</label>
-        <input type="password" id="confirm-password" name="confirmPassword" v-model="formMapping.confirmPassword" @input="validateField(formMapping.confirmPassword, 'confirmPassword')" :class="{'input-error': errorMsgs.confirmPassword.length !== 0}">
-        <span class="error-msg" v-if="errorMsgs.confirmPassword.length !== 0">{{ errorMsgs.confirmPassword }}</span>
-      </div>
-      <button type="submit" @click.prevent="verifyAndSubmit">Register</button>
+      <button type="submit" @click.prevent="verifyAndSubmit">Login</button>
     </form>
   </div>
 </template>
 <style scoped>
-  .register-box {
+  .login-box {
     display: flex;
     flex-direction: column;
     gap: 1rem;

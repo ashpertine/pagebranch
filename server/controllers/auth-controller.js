@@ -47,7 +47,10 @@ function getLoginStatus(req, res) {
   try {
     let statusCode = 200;
     const errorMsg = req.session.messages ?? false;
-    if (req.session.messages) delete req.session.messages;
+    if (req.session.messages) {
+      statusCode = 401;
+      delete req.session.messages;
+    }
     if (req.session.noAuthCode) {
       statusCode = req.session.noAuthCode;
       delete req.session.noAuthCode;

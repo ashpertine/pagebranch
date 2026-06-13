@@ -1,6 +1,7 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { useFlash } from "./useFlash.js";
+import { capitalizeFirstLetter } from "./helpers.js";
 
 export function useRegisterForm() {
   const router = useRouter();
@@ -21,9 +22,9 @@ export function useRegisterForm() {
   async function submitRegister() {
     try {
       const response = await createRegisterRequest(
-        username.value,
-        password.value,
-        confirmPassword.value,
+        formMapping.value.username,
+        formMapping.value.password,
+        formMapping.value.confirmPassword,
       );
 
       if (!response.ok) {
@@ -45,9 +46,37 @@ export function useRegisterForm() {
     }
   }
 
-  const username = ref("");
-  const password = ref("");
-  const confirmPassword = ref("");
+  function validateField(field_ref, field_name) {
+    let error = false;
+    if (field_ref.length === 0) {
+      errorMsgs.value[field_name] =
+        `${capitalizeFirstLetter(field_name)} is empty!`;
+      error = true;
+    } else {
+      if (field_name === "username" && field_ref.length > 20) {
+        errorMsgs.value[field_name] =
+          `${capitalizeFirstLetter(field_name)} cannot be more than 20 characters.`;
+        error = true;
+      } else if (
+        (field_name === "password" || field_name === "confirmPassword") &&
+        (field_ref.length < 8 || field_ref.length > 30)
+      ) {
+        errorMsgs.value[field_name] =
+          `${capitalizeFirstLetter(field_name)} cannot be more than 30 characters or less than 8 characters.`;
+        error = true;
+      } else {
+        errorMsgs.value[field_name] = "";
+      }
+    }
+
+    return error;
+  }
+
+  const formMapping = ref({
+    username: "",
+    password: "",
+    confirmPassword: "",
+  });
 
   const errorMsgs = ref({
     global: "",
@@ -58,9 +87,8 @@ export function useRegisterForm() {
 
   return {
     router,
-    username,
-    password,
-    confirmPassword,
+    formMapping,
+    validateField,
     errorMsgs,
     submitRegister,
   };
