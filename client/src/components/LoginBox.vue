@@ -3,10 +3,12 @@
   const { formMapping, errorMsgs, validateField, submitLogin } = useLoginForm()
 
   async function verifyAndSubmit() {
+    let errors = [];
     for(const value of Object.keys(errorMsgs.value).filter(el => el !== "global")) {
-        const error = validateField(formMapping.value[value], value);
-        if(error) return;
+        errors.push(validateField(formMapping.value[value], value));
     }
+
+    if(errors.includes(true)) return;
     
     await submitLogin();
   }
