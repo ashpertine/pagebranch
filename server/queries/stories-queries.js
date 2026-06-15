@@ -7,7 +7,10 @@ async function getStoriesByTitle(story_title) {
 }
 
 async function getAllStoriesByUser(user_id) {
-  const { rows } = await pbPool.query("SELECT * FROM stories");
+  const { rows } = await pbPool.query(
+    "SELECT * FROM stories WHERE author_id = $1",
+    [user_id],
+  );
   return rows;
 }
 

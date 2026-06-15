@@ -20,6 +20,8 @@ authRouter.post(
   }),
 );
 
+authRouter.post("/logOut", authController.logOutPost);
+
 authRouter.get("/loginStatus", authController.getLoginStatus);
 
 export { authRouter };

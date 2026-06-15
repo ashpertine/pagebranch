@@ -3,7 +3,7 @@ import storiesQueries from "../queries/stories-queries.js";
 async function getUserStories(req, res) {
   try {
     const userId = req.session.passport.user;
-    const results = storiesQueries.getAllStoriesByUser(userId);
+    const results = await storiesQueries.getAllStoriesByUser(userId);
     return res.status(200).json(results);
   } catch (error) {
     console.error(error);

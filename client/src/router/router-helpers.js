@@ -1,6 +1,6 @@
 import { useRouter } from "vue-router";
 
-async function guard(to, from, next) {
+async function getAuthStatus() {
   const router = useRouter();
   try {
     const response = await fetch("/api/loginStatus", {
@@ -9,13 +9,13 @@ async function guard(to, from, next) {
 
     const body = await response.json();
     if (body.currentUser) {
-      next();
+      return true;
     } else {
-      router.replace({ path: "/login" });
+      return false;
     }
   } catch (error) {
-    router.replace({ path: "/login" });
+    return false;
   }
 }
 
-export { guard };
+export { getAuthStatus };

@@ -69,7 +69,19 @@ function getLoginStatus(req, res) {
   }
 }
 
+function logOutPost(req, res, next) {
+  req.logout((error) => {
+    if (error) {
+      res.status(500).json({
+        errorMsg: error.toString(),
+      });
+    }
+    return res.redirect("/api/loginStatus");
+  });
+}
+
 export default {
   registerNewUserPost,
   getLoginStatus,
+  logOutPost,
 };
