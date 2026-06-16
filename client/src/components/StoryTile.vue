@@ -6,7 +6,6 @@
 </script>
 <template>
     <p>{{ title }}</p>
-    <p>{{ storyId }}</p>
     <p>{{ createdAt }}</p>
     <p>{{ updatedAt }}</p>
 </template>

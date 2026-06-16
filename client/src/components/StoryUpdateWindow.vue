@@ -1,14 +1,18 @@
 <script setup>
-  import { ref } from "vue";
+  import { ref, onMounted } from "vue";
+
+  const emit = defineEmits(["stories-updated"]);
+  const props = defineProps(['storyId', 'currentStoryTitle'])
+
   const errorMsg = ref("");
   const storyTitle = ref("");
   const isHidden = ref(true);
 
-  async function createMakeStoryRequest(story_title) {
+  async function createUpdateStoryRequest(story_title, story_id) {
     try{
-      const response = await fetch('/api/stories/new', {
-        method: "POST",
-        body: JSON.stringify({story_title }),
+      const response = await fetch(`/api/stories/${story_id}/update`, {
+        method: "PATCH",
+        body: JSON.stringify({story_title}),
         headers: new Headers({
           "Content-Type": "application/json",
         })
@@ -17,13 +21,12 @@
       const body = await response.json();
       if(response.ok) {
         isHidden.value = true;
-        console.log("i am here");
-        emit("storiesUpdated");
+        emit("stories-updated");
       }else {
         errorMsg.value =  body.errorMsg;
       }
     }catch(error) {
-      errorMsg.value = 'Server error. Please try again later.'
+      errorMsg.value = 'Server error. Please try again later' + error.toString();
     }
   }
 
@@ -42,20 +45,24 @@
     let error = validateStoryTitle()
     if(error) return;
 
-    await createMakeStoryRequest(storyTitle.value);
+    await createUpdateStoryRequest(storyTitle.value, props.storyId);
   }
+
+  onMounted(() => {
+    storyTitle.value = props.currentStoryTitle;
+  })
 </script>
 <template>
-  <button type="button" @click="isHidden = !isHidden">Add new story</button>
-  <div class="window story-create" v-if="!isHidden">
+  <button type="button" @click="isHidden = !isHidden">Update Story</button>
+  <div class="window story-update" v-if="!isHidden">
     <button type="button" @click="isHidden = true">Close</button>
     <form>
       <span class="error-msg" v-if="errorMsg.length !== 0">{{ errorMsg }}</span>
       <div class="form-field">
         <label for="story-title">Story Title: </label>
-        <input type="text" id="story-title" name="story-title" v-model="storyTitle" @input="validateStoryTitle" :class="{'input-error': errorMsg.length !== 0}">
+        <input type="text" id="story-title" name="story-title" v-model="storyTitle" @input="validateStoryTitle" :class="{'input-error': errorMsg.length !== 0}" :value="storyTitle">
       </div>
-      <button type="submit" @click.prevent="verifyAndSubmit" :disabled="errorMsg.length !== 0">Add</button>
+      <button type="submit" @click.prevent="verifyAndSubmit" :disabled="errorMsg.length !== 0">Update</button>
     </form>
   </div>
 </template>
