@@ -1,5 +1,6 @@
 <script setup>
   import { ref } from "vue";
+  import { createMakeStoryRequest } from "../../api/stories-api.js";
 
   const emit = defineEmits(["stories-updated"]);
 
@@ -7,26 +8,18 @@
   const storyTitle = ref("");
   const isHidden = ref(true);
 
-  async function createMakeStoryRequest(story_title) {
-    try{
-      const response = await fetch('/api/stories/new', {
-        method: "POST",
-        body: JSON.stringify({story_title }),
-        headers: new Headers({
-          "Content-Type": "application/json",
-        })
-      })
-      
-      const body = await response.json();
-      if(response.ok) {
-        isHidden.value = true;
-        console.log("i am here");
-        emit("stories-updated");
-      }else {
-        errorMsg.value =  body.errorMsg;
-      }
-    }catch(error) {
-      errorMsg.value = 'Server error. Please try again later' + error.toString();
+  async function makeStory(story_title) {
+    const response = await createMakeStoryRequest(story_title);
+    if(response.errorMsg) {
+      errorMsg.value = response.responseErr;
+    }
+
+    const body = await response.json();
+    if(response.ok) {
+      isHidden.value = true;
+      emit("stories-updated");
+    }else {
+      errorMsg.value =  body.errorMsg;
     }
   }
 
@@ -45,7 +38,7 @@
     let error = validateStoryTitle()
     if(error) return;
 
-    await createMakeStoryRequest(storyTitle.value);
+    await makeStory(storyTitle.value);
   }
 </script>
 <template>

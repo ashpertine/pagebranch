@@ -1,5 +1,5 @@
 <script setup>
-  import { useRegisterForm } from '../composables/useRegisterForm.js';
+  import { useRegisterForm } from '../composables/register-form.js';
   const { formMapping, validateField, errorMsgs, submitRegister } = useRegisterForm()
 
   async function verifyAndSubmit() {

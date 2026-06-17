@@ -1,6 +1,6 @@
 <script setup>
   import { ref, onMounted } from 'vue';
-  import { useFlash } from '../composables/useFlash.js';
+  import { useFlash } from '../composables/flash.js';
   const { consumeFlash } = useFlash();
 
   const currentType = ref("");

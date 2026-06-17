@@ -1,5 +1,5 @@
 <script setup>
-  import { useLoginForm } from '../composables/useLoginForm.js';
+  import { useLoginForm } from '../composables/login-form.js';
   const { formMapping, errorMsgs, validateField, submitLogin } = useLoginForm()
 
   async function verifyAndSubmit() {

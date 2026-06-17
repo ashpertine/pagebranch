@@ -1,5 +1,6 @@
 <script setup>
   import { ref, onMounted } from "vue";
+  import { createUpdateStoryRequest } from "../../api/stories-api.js";
 
   const emit = defineEmits(["stories-updated"]);
   const props = defineProps(['storyId', 'currentStoryTitle'])
@@ -8,25 +9,18 @@
   const storyTitle = ref("");
   const isHidden = ref(true);
 
-  async function createUpdateStoryRequest(story_title, story_id) {
-    try{
-      const response = await fetch(`/api/stories/${story_id}/update`, {
-        method: "PATCH",
-        body: JSON.stringify({story_title}),
-        headers: new Headers({
-          "Content-Type": "application/json",
-        })
-      })
-      
-      const body = await response.json();
-      if(response.ok) {
-        isHidden.value = true;
-        emit("stories-updated");
-      }else {
-        errorMsg.value =  body.errorMsg;
-      }
-    }catch(error) {
-      errorMsg.value = 'Server error. Please try again later' + error.toString();
+  async function updateStory(story_title, story_id) {
+    const response = await createUpdateStoryRequest(story_title, story_id)
+    if(response.errorMsg) {
+      errorMsg.value = response.responseErr;
+    }
+
+    const body = await response.json();
+    if(response.ok) {
+      isHidden.value = true;
+      emit("stories-updated");
+    }else {
+      errorMsg.value =  body.errorMsg;
     }
   }
 
@@ -45,7 +39,7 @@
     let error = validateStoryTitle()
     if(error) return;
 
-    await createUpdateStoryRequest(storyTitle.value, props.storyId);
+    await updateStory(storyTitle.value, props.storyId);
   }
 
   onMounted(() => {

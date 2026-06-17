@@ -1,21 +1,10 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { capitalizeFirstLetter } from "./helpers.js";
+import { createLoginRequest } from "../api/auth-api.js";
 
 export function useLoginForm() {
   const router = useRouter();
-
-  async function createLoginResponse(username, password) {
-    const response = await fetch("/api/login", {
-      method: "POST",
-      body: JSON.stringify({ username, password }),
-      headers: new Headers({
-        "Content-Type": "application/json",
-      }),
-    });
-
-    return response;
-  }
 
   function validateField(field_ref, field_name) {
     let error = false;
@@ -32,7 +21,7 @@ export function useLoginForm() {
 
   async function submitLogin() {
     try {
-      const response = await createLoginResponse(
+      const response = await createLoginRequest(
         formMapping.value.username,
         formMapping.value.password,
       );

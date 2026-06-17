@@ -1,23 +1,12 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { useFlash } from "./useFlash.js";
+import { useFlash } from "./flash.js";
 import { capitalizeFirstLetter } from "./helpers.js";
+import { createRegisterRequest } from "../api/auth-api.js";
 
 export function useRegisterForm() {
   const router = useRouter();
   const { setFlash } = useFlash();
-
-  async function createRegisterRequest(username, password, confirmPassword) {
-    const response = await fetch("/api/register", {
-      method: "POST",
-      body: JSON.stringify({ username, password, confirmPassword }),
-      headers: new Headers({
-        "Content-Type": "application/json",
-      }),
-    });
-
-    return response;
-  }
 
   async function submitRegister() {
     try {
