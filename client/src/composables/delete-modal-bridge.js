@@ -1,5 +1,4 @@
 import { ref } from "vue";
-import { useRouter } from "vue-router";
 
 function deleteModalBridge() {
   const deleteModalHidden = ref(true);

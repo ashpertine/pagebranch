@@ -15,6 +15,7 @@
 </script>
 <template>
   <div class="login-box">
+    <h2>Login</h2>
     <form @input="errorMsgs.global = ''">
       <span class="error-msg global" v-if="errorMsgs.global.length !== 0">{{ errorMsgs.global }}</span>
       <div class="form-field">
@@ -37,8 +38,16 @@
     flex-direction: column;
     gap: 1rem;
     width: 100%;
-    max-width: 400px;
+    max-width: 500px;
     padding: 2rem;
+    background-color: var(--light-background-muted);
+    border: 1px solid var(--light-color-border);
+    border-radius: 5px;
+  }
+
+  .login-box > h2 {
+    font-weight: 100;
+    font-size: 3rem;
   }
 
   form {
@@ -50,29 +59,58 @@
   .form-field {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 1rem;
   }
 
   input {
-    padding: 0.5rem;
+    padding: 0.75rem 1rem;
     font-size: 1rem;
+    background-color: var(--light-background-bright);
+    border-radius: 5px;
+    border: 1px solid var(--light-color-border);
   }
 
   button {
-    padding: 0.5rem;
+    background-color: var(--light-color-primary);
+    color: var(--light-color-text);
+    border-radius: 10px;
+    padding: 0.8em 1em;
+    border: 0;
     font-size: 1rem;
     cursor: pointer;
     align-self: flex-start;
   }
 
   .error-msg {
-    color: red;
+    color: var(--color-error);
     font-size: 0.85rem;
   }
 
   .input-error {
-    border: 1px solid red;
-    background-color: lightcoral;
-    color: darkred;
+    border: 2px solid var(--color-error);
+    color: var(--color-error);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body {
+      background-color: var(--dark-background);
+      color: var(--dark-color-text);
+    }
+
+    .login-box {
+      background-color: var(--dark-background-muted);
+      border: 1px solid var(--dark-color-border);
+    }
+
+    input {
+      background-color: var(--dark-background);
+      color: var(--dark-color-text);
+      border: 1px solid var(--dark-color-border);
+    }
+
+    button {
+      background-color: var(--dark-color-primary);
+      color: var(--dark-color-text);
+    }
   }
 </style>

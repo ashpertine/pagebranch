@@ -3,7 +3,20 @@
   import LoginBox from '../components/LoginBox.vue';
 </script>
 <template>
-  <h1>Login Page</h1>
-  <FlashMessage />
-  <LoginBox />
+  <div class="login-box-container">
+    <FlashMessage />
+    <LoginBox />
+  </div>
 </template>
+
+<style scoped>
+.login-box-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  padding: 0 20px;
+}
+</style>

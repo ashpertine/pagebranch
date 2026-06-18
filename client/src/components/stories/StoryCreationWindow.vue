@@ -57,19 +57,69 @@
 </template>
 <style scoped>
   .window {
-    border: 2px solid black;
     display: inline-block;
     padding: 20px;
+    border: 1px solid var(--light-color-border);
+    border-radius: 5px;
+    background-color: var(--light-background-muted);
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  input {
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    background-color: var(--light-background-bright);
+    border-radius: 5px;
+    border: 1px solid var(--light-color-border);
+  }
+
+  button {
+    background-color: var(--light-color-primary);
+    color: var(--light-color-text);
+    border-radius: 10px;
+    padding: 0.8em 1em;
+    border: 0;
+    font-size: 1rem;
+    cursor: pointer;
+    align-self: flex-start;
   }
 
   .error-msg {
-    color: red;
+    color: var(--color-error);
     font-size: 0.85rem;
   }
 
   .input-error {
-    border: 1px solid red;
-    background-color: lightcoral;
-    color: darkred;
+    border: 2px solid var(--color-error);
+    color: var(--color-error);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .window {
+      background-color: var(--dark-background-muted);
+      border: 1px solid var(--dark-color-border);
+    }
+
+    input {
+      background-color: var(--dark-background);
+      color: var(--dark-color-text);
+      border: 1px solid var(--dark-color-border);
+    }
+
+    button {
+      background-color: var(--dark-color-primary);
+      color: var(--dark-color-text);
+    }
   }
 </style>

@@ -82,7 +82,15 @@
     display: flex;
     flex-direction: column;
     padding: 20px;
-    border: 2px solid black; 
+    border: 1px solid var(--light-color-border);
+    border-radius: 5px;
+    background-color: var(--light-background-muted);
   }
-   
+
+  @media (prefers-color-scheme: dark) {
+    .story-card {
+      background-color: var(--dark-background-muted);
+      border: 1px solid var(--dark-color-border);
+    }
+  }
 </style>
