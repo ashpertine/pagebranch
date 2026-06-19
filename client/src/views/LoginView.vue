@@ -10,13 +10,4 @@
 </template>
 
 <style scoped>
-.login-box-container {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-  padding: 0 20px;
-}
 </style>

@@ -1,122 +1,72 @@
 <script setup>
-  import { useRegisterForm } from '../composables/register-form.js';
-  const { formMapping, validateField, errorMsgs, submitRegister } = useRegisterForm()
+  import { RegisterForm } from '../composables/register-form.js';
+  const { form, formMapping, globalErrorMsg, submitRegister } = RegisterForm()
+
+  const usernameRules = [
+    value => {
+      if(value) return true
+      return 'Username is empty!'
+    },
+    value => {
+      if(value?.length <= 20) return true
+
+      return 'Username cannot be more than 20 characters.'
+    },
+  ]
+
+
+  const passwordRules = [
+    value => {
+      if(value) return true;
+      return 'Password is empty!';
+    },
+    value => {
+      if(value?.length <= 8) return 'Password cannot be less than 8 characters';
+      else if(value?.length >= 30) return 'Password cannot be more than 30 characters';
+      return true;
+    },
+  ]
+
+  const confirmPasswordRules = [...passwordRules,
+    value => {
+      if(formMapping.value.confirmPassword !== formMapping.value.password) return 'Passwords do not match.';
+      return true;
+    }
+  ]
 
   async function verifyAndSubmit() {
-    let errors = [];
-    for(const value of Object.keys(errorMsgs.value).filter(el => el !== "global")) {
-        errors.push(validateField(formMapping.value[value], value));
+    const { valid } = await form.value.validate();
+    if(!valid) { // not valid...
+      return
     }
 
-    if(errors.includes(true)) return;
- 
     await submitRegister();
   }
+
 </script>
 <template>
-  <div class="register-box">
-    <h2>Register</h2>
-    <form @input="errorMsgs.global = ''">
-      <span class="error-msg global" v-if="errorMsgs.global.length !== 0">{{ errorMsgs.global }}</span>
-      <div class="form-field">
-        <label for="username">Username</label>
-        <input type="text" id="username" name="username" v-model="formMapping.username" @input="validateField(formMapping.username, 'username')" :class="{'input-error': errorMsgs.username.length !== 0}">
-        <span class="error-msg" v-if="errorMsgs.username.length !== 0">{{ errorMsgs.username }}</span>
-      </div>
-      <div class="form-field">
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" v-model="formMapping.password" @input="validateField(formMapping.password, 'password')" :class="{'input-error': errorMsgs.password.length !== 0}">
-        <span class="error-msg" v-if="errorMsgs.password.length !== 0">{{ errorMsgs.password }}</span>
-      </div>
-      <div class="form-field">
-        <label for="confirm-password">Confirm Password</label>
-        <input type="password" id="confirm-password" name="confirmPassword" v-model="formMapping.confirmPassword" @input="validateField(formMapping.confirmPassword, 'confirmPassword')" :class="{'input-error': errorMsgs.confirmPassword.length !== 0}">
-        <span class="error-msg" v-if="errorMsgs.confirmPassword.length !== 0">{{ errorMsgs.confirmPassword }}</span>
-      </div>
-      <button type="submit" @click.prevent="verifyAndSubmit">Register</button>
-    </form>
-  </div>
+  <v-container class=" bg-grey-darken-3 d-flex justify-center flex-column align-center" min-height="100vh" min-width="100%">
+    <v-card title="Register" subtitle="Welcome to pagebranch!" class="w-md-50 w-100 px-10 py-10">
+      <v-form ref="form" @submit.prevent="verifyAndSubmit">
+        <v-container fluid class="d-flex flex-column ga-2">
+          <div class="text-title-medium text-red-lighten-2 text-decoration-underline py-2 px-1 rounded-md"  v-if="globalErrorMsg.length !== 0"> {{ globalErrorMsg }}</div>
+            <v-text-field v-model="formMapping.username" :rules="usernameRules" :counter="20" label="Username" @input="globalErrorMsg = ''"></v-text-field>
+            <v-row>
+              <v-col cols="12" md="6">
+                <v-text-field v-model="formMapping.password" :rules="passwordRules" :counter="30" label="Password" type="password" @input="globalErrorMsg = ''"></v-text-field>
+              </v-col>
+              <v-col cols="12" md="6">
+                <v-text-field v-model="formMapping.confirmPassword" :rules="confirmPasswordRules" counter="30" label="Confirm Password" type="password" @input="globalErrorMsg = ''"></v-text-field>
+              </v-col>
+            </v-row>
+        </v-container>
+        <v-container fluid class="d-flex justify-space-between flex-wrap ga-2">
+          <v-btn to="/login" color="green">Login</v-btn>
+          <v-btn variant="tonal" size="large" type="submit" append-icon="mdi-account-plus" color="blue" >Register</v-btn>
+        </v-container>
+      </v-form>
+    </v-card>
+  </v-container>
 </template>
 <style scoped>
-  .register-box {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    width: 100%;
-    max-width: 500px;
-    padding: 48px;
-    background-color: var(--light-background-muted);
-    border: 1px solid var(--light-color-border);
-    border-radius: 5px;
-  }
-
-  .register-box > h2 {
-    font-weight: 100;
-    font-size: 3rem;
-  }
-
-  form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .form-field {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  input {
-    padding: 0.75rem 1rem;
-    font-size: 1rem;
-    background-color: var(--light-background-bright);
-    border-radius: 5px;
-    border: 1px solid var(--light-color-border);
-  }
-
-  button {
-    background-color: var(--light-color-primary);
-    color: var(--light-color-text);
-    border-radius: 10px;
-    padding: 0.8em 1em;
-    border: 0;
-    font-size: 1rem;
-    cursor: pointer;
-    align-self: flex-start;
-  }
-
-  .error-msg {
-    color: var(--color-error);
-    font-size: 0.85rem;
-  }
-
-  .input-error {
-    border: 2px solid var(--color-error);
-    color: var(--color-error);
-  }
-
-
-  @media (prefers-color-scheme: dark) {
-    body {
-      background-color: var(--dark-background);
-      color: var(--dark-color-text);
-    }
-
-    .register-box {
-      background-color: var(--dark-background-muted);
-      border: 1px solid var(--dark-color-border);
-    }
-
-    input {
-      background-color: var(--dark-background);
-      color: var(--dark-color-text);
-      border: 1px solid var(--dark-color-border);
-    }
-
-    button {
-      background-color: var(--dark-color-primary);
-      color: var(--dark-color-text);
-    }
-  }
 </style>

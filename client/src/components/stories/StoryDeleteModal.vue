@@ -24,11 +24,13 @@
 </script>
 <template>
   <div class="modal story-delete" v-if="!isHidden">
-    <button type="button" @click="$emit('close-delete-modal')">Close</button>
+    <button type="button" class="close-modal" @click="$emit('close-delete-modal')">Close</button>
     <span>Are you sure you want to delete this story?</span>
     <span class="error-msg" v-if="errorMsg.length !== 0">{{ errorMsg }}</span>
     <button type="submit" @click.prevent="deleteStory(storyId)" :disabled="errorMsg.length !== 0" @click="$emit('close-delete-modal')">Yes</button>
   </div>
+  <div class="overlay"  v-if="!isHidden"></div>
 </template>
+
 <style scoped>
 </style>

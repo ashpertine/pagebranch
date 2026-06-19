@@ -72,25 +72,4 @@
   </div>
 </template>
 <style scoped>
-  .stories-view {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .story-card {
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-    border: 1px solid var(--light-color-border);
-    border-radius: 5px;
-    background-color: var(--light-background-muted);
-  }
-
-  @media (prefers-color-scheme: dark) {
-    .story-card {
-      background-color: var(--dark-background-muted);
-      border: 1px solid var(--dark-color-border);
-    }
-  }
 </style>

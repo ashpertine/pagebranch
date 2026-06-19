@@ -4,9 +4,12 @@ import { useFlash } from "./flash.js";
 import { capitalizeFirstLetter } from "./helpers.js";
 import { createRegisterRequest } from "../api/auth-api.js";
 
-export function useRegisterForm() {
+export function RegisterForm() {
   const router = useRouter();
   const { setFlash } = useFlash();
+
+  const globalErrorMsg = ref("");
+  const form = ref();
 
   async function submitRegister() {
     try {
@@ -19,11 +22,9 @@ export function useRegisterForm() {
       if (!response.ok) {
         const responseErrorMsg = (await response.json()).errorMsg;
         if ([400, 409].includes(Number(response.status))) {
-          for (const [field, message] of Object.entries(responseErrorMsg)) {
-            errorMsgs.value[field] = message;
-          }
+          globalErrorMsg.value = `Register request rejected. Correct your values and try again.`;
         } else {
-          errorMsgs.value.global = `HTTP error ${response.status}: ${responseErrorMsg}`;
+          globalErrorMsg.value = `HTTP error ${response.status}: ${responseErrorMsg}`;
         }
       } else {
         // handle ok response
@@ -35,40 +36,7 @@ export function useRegisterForm() {
     }
   }
 
-  function validateField(field_ref, field_name) {
-    let error = false;
-    if (field_ref.length === 0) {
-      errorMsgs.value[field_name] =
-        `${capitalizeFirstLetter(field_name)} is empty!`;
-      error = true;
-    } else {
-      if (field_name === "username" && field_ref.length > 20) {
-        errorMsgs.value[field_name] =
-          `${capitalizeFirstLetter(field_name)} cannot be more than 20 characters.`;
-        error = true;
-      } else if (
-        (field_name === "password" || field_name === "confirmPassword") &&
-        (field_ref.length < 8 || field_ref.length > 30)
-      ) {
-        errorMsgs.value[field_name] =
-          `${capitalizeFirstLetter(field_name)} cannot be more than 30 characters or less than 8 characters.`;
-        error = true;
-      } else {
-        errorMsgs.value[field_name] = "";
-      }
-    }
-
-    return error;
-  }
-
   const formMapping = ref({
-    username: "",
-    password: "",
-    confirmPassword: "",
-  });
-
-  const errorMsgs = ref({
-    global: "",
     username: "",
     password: "",
     confirmPassword: "",
@@ -76,9 +44,9 @@ export function useRegisterForm() {
 
   return {
     router,
+    form,
     formMapping,
-    validateField,
-    errorMsgs,
+    globalErrorMsg,
     submitRegister,
   };
 }

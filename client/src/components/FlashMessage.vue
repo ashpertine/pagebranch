@@ -20,20 +20,3 @@
     {{ currentMessage }}
   </p>
 </template>
-
-<style scoped>
-  #flash-message {
-    padding: 20px 10px;
-    display: inline-block;
-  }
-  #flash-message.flash-success {
-    border: 2px solid green;
-    background: lightgreen;
-    color: green;
-  }
-  #flash-message.flash-error {
-    border: 2px solid darkred;
-    background: lightcoral;
-    color: darkred;
-  }
-</style>
