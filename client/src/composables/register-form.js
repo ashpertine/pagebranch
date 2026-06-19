@@ -22,7 +22,11 @@ export function RegisterForm() {
       if (!response.ok) {
         const responseErrorMsg = (await response.json()).errorMsg;
         if ([400, 409].includes(Number(response.status))) {
-          globalErrorMsg.value = `Register request rejected. Correct your values and try again.`;
+          if (responseErrorMsg.global.includes("exists")) {
+            globalErrorMsg.value = responseErrorMsg.global;
+          } else {
+            globalErrorMsg.value = `Register request rejected. Correct your values and try again.`;
+          }
         } else {
           globalErrorMsg.value = `HTTP error ${response.status}: ${responseErrorMsg}`;
         }
@@ -32,7 +36,7 @@ export function RegisterForm() {
         router.replace({ path: "/login" });
       }
     } catch (error) {
-      errorMsgs.value.global = `Server Error. Please try again later.`;
+      globalErrorMsg.value = `Server Error. Please try again later.`;
     }
   }
 

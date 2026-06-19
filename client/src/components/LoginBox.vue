@@ -1,5 +1,6 @@
 <script setup>
   import { LoginForm } from '../composables/login-form.js';
+  import FlashMessage from '../components/FlashMessage.vue';
   const { form, formMapping, globalErrorMsg, validateField, submitLogin } = LoginForm()
 
   const usernameRules = [
@@ -41,6 +42,7 @@
     <v-card title="Login" subtitle="Welcome to pagebranch!" class="w-lg-50 w-100 px-10 py-10">
       <v-form ref="form" @submit.prevent="verifyAndSubmit">
         <v-container fluid class="d-flex flex-column ga-2">
+          <FlashMessage />
           <div class="text-title-medium text-red-lighten-2 text-decoration-underline py-2 px-1 rounded-md"  v-if="globalErrorMsg.length !== 0"> {{ globalErrorMsg }}</div>
             <v-text-field v-model="formMapping.username" :rules="usernameRules" :counter="20" label="Username" @input="globalErrorMsg = ''"></v-text-field>
             <v-text-field v-model="formMapping.password" :rules="passwordRules" :counter="30" label="Password" type="password" @input="globalErrorMsg = ''"></v-text-field>

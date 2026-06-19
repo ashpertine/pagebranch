@@ -4,7 +4,6 @@
 </script>
 <template>
   <div class="login-box-container">
-    <FlashMessage />
     <LoginBox />
   </div>
 </template>
