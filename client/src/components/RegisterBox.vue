@@ -1,5 +1,6 @@
 <script setup>
   import { RegisterForm } from '../composables/register-form.js';
+
   const { form, formMapping, globalErrorMsg, submitRegister } = RegisterForm()
 
   const usernameRules = [
@@ -61,8 +62,8 @@
             </v-row>
         </v-container>
         <v-container fluid class="d-flex justify-space-between flex-wrap ga-2">
-          <v-btn to="/login" color="green">Login</v-btn>
-          <v-btn variant="tonal" size="large" type="submit" append-icon="mdi-account-plus" color="blue" >Register</v-btn>
+          <v-btn to="/login" color="success">Login</v-btn>
+          <v-btn variant="tonal" size="large" type="submit" append-icon="mdi-account-plus" color="primary" >Register</v-btn>
         </v-container>
       </v-form>
     </v-card>

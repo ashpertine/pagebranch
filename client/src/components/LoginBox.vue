@@ -50,9 +50,9 @@
         <v-container fluid class="d-flex flex-wrap ga-2">
           <v-container class="d-flex w-auto ga-2 align-center flex-grow-1 pa-0">
             <div text-body-medium class="text-medium-emphasis">No account yet?</div>
-            <v-btn to="/register" color="green">Register</v-btn>
+            <v-btn to="/register" color="success">Register</v-btn>
           </v-container>
-          <v-btn variant="tonal" size="large" type="submit" append-icon="mdi-account-plus" color="blue" >Login</v-btn>
+          <v-btn variant="tonal" size="large" type="submit" append-icon="mdi-account-plus" color="primary" >Login</v-btn>
         </v-container>
       </v-form>
     </v-card>

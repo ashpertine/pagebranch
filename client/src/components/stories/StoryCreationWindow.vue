@@ -6,9 +6,13 @@
 
   const errorMsg = ref("");
   const storyTitle = ref("");
-  const isHidden = ref(true);
+  const dialog = ref(false);
+  const form = ref();
 
   async function makeStory(story_title) {
+    const { valid } = form.value.validate(); 
+    if(!valid) return;
+    
     const response = await createMakeStoryRequest(story_title);
     if(response.errorMsg) {
       errorMsg.value = response.responseErr;
@@ -16,46 +20,43 @@
 
     const body = await response.json();
     if(response.ok) {
-      isHidden.value = true;
+      dialog.value = false;
       emit("stories-updated");
     }else {
       errorMsg.value =  body.errorMsg;
     }
   }
 
-  function validateStoryTitle() {
-    if(storyTitle.value.length > 80) {
-      errorMsg.value = "The title should not be more than 80 characters.";
-      console.log(errorMsg.value);
-      return true;
-    }else {
-      errorMsg.value = ''
-      return false;
+  const titleRules = [
+    value => {
+      if(value) return true;
+      return 'Story title must not be empty.'
     }
-  }
-
-  async function verifyAndSubmit() {
-    let error = validateStoryTitle()
-    if(error) return;
-
-    await makeStory(storyTitle.value);
-  }
+  ]
 </script>
-<template>
-  <button type="button" @click="isHidden = !isHidden">Add new story</button>
-  <div class="window story-create" v-if="!isHidden">
-    <button type="button" @click="isHidden = true">Close</button>
-    <form>
-      <span class="error-msg" v-if="errorMsg.length !== 0">{{ errorMsg }}</span>
-      <div class="form-field">
-        <label for="story-title">Story Title: </label>
-        <input type="text" id="story-title" name="story-title" v-model="storyTitle" @input="validateStoryTitle" :class="{'input-error': errorMsg.length !== 0}">
-      </div>
-      <button type="submit" @click.prevent="verifyAndSubmit" :disabled="errorMsg.length !== 0">Add</button>
-    </form>
-  </div>
-  <div class="overlay" @click="isHidden = !isHidden" v-if="!isHidden">
-  </div>
+<template> 
+  <v-icon-btn @click="dialog = true"
+    color="primary"
+    icon="mdi-plus"
+    variant="flat"
+  ></v-icon-btn>
+  <v-dialog max-width="500" v-model="dialog">
+    <v-card title="Add new story">
+      <div class="text-title-medium text-red-lighten-2 pb-4 px-5 rounded-md"  v-if="errorMsg.length !== 0"> {{ errorMsg }}</div>
+      <v-form class="px-5" @submit.prevent="makeStory(storyTitle)" ref="form">
+        <v-text-field label="Title" v-model="storyTitle" :rules="titleRules"></v-text-field>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            text="Close Dialog"
+            color="primary"
+            @click="dialog = false"
+          ></v-btn>
+          <v-btn variant="tonal" size="large" type="submit" append-icon="mdi-plus" color="green" >Add</v-btn>
+        </v-card-actions>
+      </v-form>
+    </v-card>
+  </v-dialog>
 </template>
 <style scoped>
 </style>

@@ -8,6 +8,7 @@
   import StoryUpdateWindow from "../components/stories/StoryUpdateWindow.vue";
   import StoryDeleteButton from "../components/stories/StoryDeleteButton.vue";
   import StoryDeleteModal from "../components/stories/StoryDeleteModal.vue";
+  import AppBar from "../components/AppBar.vue";
 
   // Composables
   import { deleteModalBridge } from "../composables/delete-modal-bridge.js";
@@ -26,16 +27,6 @@
     openDeleteModal,
     closeDeleteModal,
   } = deleteModalBridge();
-
-  async function logout() {
-    const response = await createLogoutRequest(); 
-    const body = await response.json();
-    if (!body.currentUser) {
-      router.replace({ name: "Login" });
-    } else {
-      return false;
-    }
-  }
 
   async function getStories() {
     const response = await createGetStoriesRequest();
@@ -56,20 +47,17 @@
 
 </script>
 <template>
-  <div>
-    Homepage
-  </div>
-  <button type="button" @click="logout">Log Out</button>
-  <StoryCreationWindow @stories-updated="getStories"/>
-  <StoryDeleteModal :is-hidden="deleteModalHidden" @stories-updated="getStories" @close-delete-modal="closeDeleteModal" :story-id="selectedDeleteStoryId"/>
-  <div v-if="globalErrorMsg.length !== 0">{{ globalErrorMsg }}</div>
-  <div class="stories-view">
-    <div v-for="story in stories" class="story-card">
-      <StoryTile :title="story.story_title" :key="story.id" :story-id="story.id" :created-at=story.created_at :updated-at=story.updated_at />
-      <StoryUpdateWindow :story-id="story.id" :current-story-title="story.story_title" @stories-updated="getStories"/>
-      <StoryDeleteButton @popup-delete-modal="openDeleteModal(story.id)"/>
+  <v-app>
+    <AppBar @stories-updated="getStories"/>
+    <button type="button" @click="logout">Log Out</button>
+    <StoryDeleteModal :is-hidden="deleteModalHidden" @stories-updated="getStories" @close-delete-modal="closeDeleteModal" :story-id="selectedDeleteStoryId"/>
+    <div v-if="globalErrorMsg.length !== 0">{{ globalErrorMsg }}</div>
+    <div class="stories-view">
+      <div v-for="story in stories" class="story-card">
+        <StoryTile :title="story.story_title" :key="story.id" :story-id="story.id" :created-at=story.created_at :updated-at=story.updated_at />
+      </div>
     </div>
-  </div>
+  </v-app>
 </template>
 <style scoped>
 </style>
