@@ -50,6 +50,7 @@
           <v-btn
             text="Close"
             color="primary"
+            size="large"
             @click="$emit('close-update-dialog')"
           ></v-btn>
           <v-btn variant="tonal" size="large" type="submit" append-icon="mdi-pencil-outline" color="green" >Update</v-btn>

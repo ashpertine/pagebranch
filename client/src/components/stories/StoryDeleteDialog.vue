@@ -34,6 +34,7 @@
           <v-btn
             text="Close"
             color="primary"
+            size="large"
             @click="$emit('close-delete-dialog')"
           ></v-btn>
           <v-btn variant="tonal" size="large" type="submit" append-icon="mdi-delete" color="red" >Delete</v-btn>

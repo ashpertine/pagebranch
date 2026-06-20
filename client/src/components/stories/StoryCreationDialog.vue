@@ -52,6 +52,7 @@
           <v-btn
             text="Close"
             color="primary"
+            size="large"
             @click="dialog = false"
           ></v-btn>
           <v-btn variant="tonal" size="large" type="submit" append-icon="mdi-plus" color="green" >Add</v-btn>

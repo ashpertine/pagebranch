@@ -19,7 +19,7 @@
   <v-btn
     text="Logout"
     color="red"
-    variant="flat"
+    variant="tonal"
     rounded="xl"
     class="py-5"
     @click="dialog = true"
@@ -32,6 +32,7 @@
           <v-btn
             text="Close"
             color="primary"
+            size="large"
             @click="dialog = false"
           ></v-btn>
           <v-btn variant="tonal" size="large" type="submit" append-icon="mdi-exit-to-app" color="red" >Log Out</v-btn>

@@ -46,28 +46,26 @@
 
 </script>
 <template>
-  <v-container class=" bg-grey-darken-3 d-flex justify-center flex-column align-center" min-height="100vh" min-width="100%">
-    <v-card title="Register" subtitle="Welcome to pagebranch!" class="w-md-50 w-100 px-10 py-10">
-      <v-form ref="form" @submit.prevent="verifyAndSubmit">
-        <v-container fluid class="d-flex flex-column ga-2">
-          <div class="text-title-medium text-red-lighten-2 text-decoration-underline py-2 px-1 rounded-md"  v-if="globalErrorMsg.length !== 0"> {{ globalErrorMsg }}</div>
-            <v-text-field v-model="formMapping.username" :rules="usernameRules" :counter="20" label="Username" @input="globalErrorMsg = ''"></v-text-field>
-            <v-row>
-              <v-col cols="12" md="6">
-                <v-text-field v-model="formMapping.password" :rules="passwordRules" :counter="30" label="Password" type="password" @input="globalErrorMsg = ''"></v-text-field>
-              </v-col>
-              <v-col cols="12" md="6">
-                <v-text-field v-model="formMapping.confirmPassword" :rules="confirmPasswordRules" counter="30" label="Confirm Password" type="password" @input="globalErrorMsg = ''"></v-text-field>
-              </v-col>
-            </v-row>
-        </v-container>
-        <v-container fluid class="d-flex justify-space-between flex-wrap ga-2">
-          <v-btn to="/login" color="success">Login</v-btn>
-          <v-btn variant="tonal" size="large" type="submit" append-icon="mdi-account-plus" color="primary" >Register</v-btn>
-        </v-container>
-      </v-form>
-    </v-card>
-  </v-container>
+  <v-card title="Register" subtitle="Welcome to pagebranch!" class="w-md-50 w-100 px-10 py-10">
+    <v-form ref="form" @submit.prevent="verifyAndSubmit">
+      <v-container fluid class="d-flex flex-column ga-2">
+        <div class="text-title-medium text-red-lighten-2 text-decoration-underline py-2 px-1 rounded-md"  v-if="globalErrorMsg.length !== 0"> {{ globalErrorMsg }}</div>
+          <v-text-field v-model="formMapping.username" :rules="usernameRules" :counter="20" label="Username" @input="globalErrorMsg = ''"></v-text-field>
+          <v-row>
+            <v-col cols="12" md="6">
+              <v-text-field v-model="formMapping.password" :rules="passwordRules" :counter="30" label="Password" type="password" @input="globalErrorMsg = ''"></v-text-field>
+            </v-col>
+            <v-col cols="12" md="6">
+              <v-text-field v-model="formMapping.confirmPassword" :rules="confirmPasswordRules" counter="30" label="Confirm Password" type="password" @input="globalErrorMsg = ''"></v-text-field>
+            </v-col>
+          </v-row>
+      </v-container>
+      <v-container fluid class="d-flex justify-space-between flex-wrap ga-2">
+        <v-btn to="/login" color="success">Login</v-btn>
+        <v-btn variant="tonal" size="large" type="submit" append-icon="mdi-account-plus" color="primary" >Register</v-btn>
+      </v-container>
+    </v-form>
+  </v-card>
 </template>
 <style scoped>
 </style>

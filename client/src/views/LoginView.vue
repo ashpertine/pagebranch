@@ -3,9 +3,11 @@
   import LoginBox from '../components/LoginBox.vue';
 </script>
 <template>
-  <div class="login-box-container">
-    <LoginBox />
-  </div>
+  <v-app>
+    <v-container class="d-flex flex-column justify-center align-center" min-width="100vw" min-height="100vh">
+      <LoginBox />
+    </v-container>
+  </v-app>
 </template>
 
 <style scoped>

@@ -38,25 +38,23 @@
   }
 </script>
 <template>
-  <v-container class=" bg-grey-darken-3 d-flex justify-center flex-column align-center" min-height="100vh" min-width="100%">
-    <v-card title="Login" subtitle="Welcome to pagebranch!" class="w-lg-50 w-100 px-10 py-10">
-      <v-form ref="form" @submit.prevent="verifyAndSubmit">
-        <v-container fluid class="d-flex flex-column ga-2">
-          <FlashMessage />
-          <div class="text-title-medium text-red-lighten-2 text-decoration-underline py-2 px-1 rounded-md"  v-if="globalErrorMsg.length !== 0"> {{ globalErrorMsg }}</div>
-            <v-text-field v-model="formMapping.username" :rules="usernameRules" :counter="20" label="Username" @input="globalErrorMsg = ''"></v-text-field>
-            <v-text-field v-model="formMapping.password" :rules="passwordRules" :counter="30" label="Password" type="password" @input="globalErrorMsg = ''"></v-text-field>
+  <v-card title="Login" subtitle="Welcome to pagebranch!" class="w-lg-50 w-100 px-10 py-10">
+    <v-form ref="form" @submit.prevent="verifyAndSubmit">
+      <v-container fluid class="d-flex flex-column ga-2">
+        <FlashMessage />
+        <div class="text-title-medium text-red-lighten-2 text-decoration-underline py-2 px-1 rounded-md"  v-if="globalErrorMsg.length !== 0"> {{ globalErrorMsg }}</div>
+          <v-text-field v-model="formMapping.username" :rules="usernameRules" :counter="20" label="Username" @input="globalErrorMsg = ''"></v-text-field>
+          <v-text-field v-model="formMapping.password" :rules="passwordRules" :counter="30" label="Password" type="password" @input="globalErrorMsg = ''"></v-text-field>
+      </v-container>
+      <v-container fluid class="d-flex flex-wrap ga-2">
+        <v-container class="d-flex w-auto ga-2 align-center flex-grow-1 pa-0">
+          <div text-body-medium class="text-medium-emphasis">No account yet?</div>
+          <v-btn to="/register" color="success">Register</v-btn>
         </v-container>
-        <v-container fluid class="d-flex flex-wrap ga-2">
-          <v-container class="d-flex w-auto ga-2 align-center flex-grow-1 pa-0">
-            <div text-body-medium class="text-medium-emphasis">No account yet?</div>
-            <v-btn to="/register" color="success">Register</v-btn>
-          </v-container>
-          <v-btn variant="tonal" size="large" type="submit" append-icon="mdi-account-plus" color="primary" >Login</v-btn>
-        </v-container>
-      </v-form>
-    </v-card>
-  </v-container>
+        <v-btn variant="tonal" size="large" type="submit" append-icon="mdi-account-plus" color="primary" >Login</v-btn>
+      </v-container>
+    </v-form>
+  </v-card>
 </template>
 <style scoped>
 </style>
