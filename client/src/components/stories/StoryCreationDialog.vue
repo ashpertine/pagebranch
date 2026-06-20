@@ -10,8 +10,10 @@
   const form = ref();
 
   async function makeStory(story_title) {
-    const { valid } = form.value.validate(); 
-    if(!valid) return;
+    const { valid } = await form.value.validate(); 
+    if(!valid) {
+      return;
+    }
     
     const response = await createMakeStoryRequest(story_title);
     if(response.errorMsg) {
@@ -48,7 +50,7 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn
-            text="Close Dialog"
+            text="Close"
             color="primary"
             @click="dialog = false"
           ></v-btn>

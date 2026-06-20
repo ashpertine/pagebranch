@@ -3,15 +3,9 @@
   import { ref, onMounted } from "vue";
 
   // Components 
-  import StoryCreationWindow from "../components/stories/StoryCreationWindow.vue";
-  import StoryTile from "../components/stories/StoryTile.vue"; 
-  import StoryUpdateWindow from "../components/stories/StoryUpdateWindow.vue";
-  import StoryDeleteButton from "../components/stories/StoryDeleteButton.vue";
-  import StoryDeleteModal from "../components/stories/StoryDeleteModal.vue";
+  import StoryCreationDialog from "../components/stories/StoryCreationDialog.vue";
+  import StoryCard from "../components/stories/StoryCard.vue"; 
   import AppBar from "../components/AppBar.vue";
-
-  // Composables
-  import { deleteModalBridge } from "../composables/delete-modal-bridge.js";
 
   // API Request functions
   import { createLogoutRequest } from "../api/auth-api.js";
@@ -20,13 +14,6 @@
   const router = useRouter(); 
   const stories = ref([]);
   const globalErrorMsg = ref("");
-
-  const {
-    deleteModalHidden,
-    selectedDeleteStoryId,
-    openDeleteModal,
-    closeDeleteModal,
-  } = deleteModalBridge();
 
   async function getStories() {
     const response = await createGetStoriesRequest();
@@ -49,14 +36,15 @@
 <template>
   <v-app>
     <AppBar @stories-updated="getStories"/>
-    <button type="button" @click="logout">Log Out</button>
-    <StoryDeleteModal :is-hidden="deleteModalHidden" @stories-updated="getStories" @close-delete-modal="closeDeleteModal" :story-id="selectedDeleteStoryId"/>
-    <div v-if="globalErrorMsg.length !== 0">{{ globalErrorMsg }}</div>
-    <div class="stories-view">
-      <div v-for="story in stories" class="story-card">
-        <StoryTile :title="story.story_title" :key="story.id" :story-id="story.id" :created-at=story.created_at :updated-at=story.updated_at />
-      </div>
-    </div>
+    <v-main>
+      <v-container fluid>
+        <v-row density="comfortable">
+          <v-col v-for="story in stories" xl="3" lg="4" md="6" cols="12" :key="story.id">
+            <StoryCard :title="story.story_title" :story-id="story.id" :created-at=story.created_at :updated-at=story.updated_at @stories-updated="getStories"/>
+          </v-col>
+        </v-row>
+      </v-container> 
+    </v-main>
   </v-app>
 </template>
 <style scoped>

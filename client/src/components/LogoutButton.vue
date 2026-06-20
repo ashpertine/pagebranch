@@ -30,7 +30,7 @@
         <v-spacer></v-spacer>
         <v-card-actions>
           <v-btn
-            text="Close Dialog"
+            text="Close"
             color="primary"
             @click="dialog = false"
           ></v-btn>

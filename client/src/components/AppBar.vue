@@ -1,5 +1,5 @@
 <script setup>
-  import StoryCreationWindow from "./stories/StoryCreationWindow.vue";
+  import StoryCreationDialog from "./stories/StoryCreationDialog.vue";
   import LogoutButton from "./LogoutButton.vue";
   const emit = defineEmits(["stories-updated"]);
 </script>
@@ -10,7 +10,7 @@
 
     <template v-slot:append> 
       <v-container class="d-flex ga-2">
-        <StoryCreationWindow @stories-updated="$emit('stories-updated')"/>
+        <StoryCreationDialog @stories-updated="$emit('stories-updated')"/>
         <LogoutButton />
       </v-container>
     </template>
