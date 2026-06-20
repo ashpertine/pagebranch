@@ -1,5 +1,5 @@
 <script setup>
-  import RegisterBox from '../components/RegisterBox.vue';  
+  import RegisterBox from '../components/auth/RegisterBox.vue';  
 </script>
 <template>
   <v-app>

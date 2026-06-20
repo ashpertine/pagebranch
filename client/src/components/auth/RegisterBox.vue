@@ -1,5 +1,5 @@
 <script setup>
-  import { RegisterForm } from '../composables/register-form.js';
+  import { RegisterForm } from '../../composables/register-form.js';
 
   const { form, formMapping, globalErrorMsg, submitRegister } = RegisterForm()
 

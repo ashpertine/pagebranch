@@ -1,6 +1,6 @@
 <script setup>
   import StoryCreationDialog from "./stories/StoryCreationDialog.vue";
-  import LogoutButton from "./LogoutButton.vue";
+  import LogoutButton from "./auth/LogoutButton.vue";
   const emit = defineEmits(["stories-updated"]);
 </script>
 <template>

@@ -1,9 +1,11 @@
 <script setup>
   import { ref, computed } from "vue";
+  import { useRouter } from "vue-router";
   import StoryDeleteDialog from './StoryDeleteDialog.vue';
   import StoryUpdateDialog from './StoryUpdateDialog.vue';
   const props = defineProps(['title', 'storyId', 'createdAt', 'updatedAt']);
   const emit = defineEmits(['stories-updated']);
+  const router = useRouter();
   const deleteDialog = ref(false);
   const updateDialog = ref(false); 
 
@@ -14,6 +16,16 @@
       return(props.title);
     }
   })
+
+  async function goToEditor() {
+    router.push({
+      name: "Editor", 
+      params: {
+      storyId:
+        props.storyId ,
+      },
+    });
+  }
 </script>
 <template>
     <v-card>
@@ -45,8 +57,8 @@
       <v-card-subtitle>
         <span class="text-title-small"> Updated: {{ updatedAt }} </span>
       </v-card-subtitle>
-      <v-card-actions>
-        <v-btn>Click me</v-btn>
+      <v-card-actions class="d-flex justify-end">
+        <v-btn variant="flat" class="px-4" @click="goToEditor">Edit</v-btn>
       </v-card-actions>
     </v-card>
     <StoryDeleteDialog v-model="deleteDialog" @close-delete-dialog="deleteDialog = false" :story-id="storyId" @stories-updated="$emit('stories-updated')"/>

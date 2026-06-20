@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@fontsource/roboto": "^5.2.10",
+    "@vue-flow/core": "^1.48.2",
     "vue": "^3.5.32",
     "vue-router": "^5.1.0",
     "vuetify": "^4.1.2"

@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import RegisterView from "../views/RegisterView.vue";
 import LoginView from "../views/LoginView.vue";
 import HomepageView from "../views/HomepageView.vue";
+import EditorView from "../views/EditorView.vue";
 import { getAuthStatus } from "./router-helpers.js";
 
 const routes = [
@@ -19,6 +20,11 @@ const routes = [
     name: "Homepage",
     path: "/home",
     component: HomepageView,
+  },
+  {
+    name: "Editor",
+    path: "/edit/:storyId",
+    component: EditorView,
   },
 ];
 

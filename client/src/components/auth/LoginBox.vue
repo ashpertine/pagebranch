@@ -1,6 +1,6 @@
 <script setup>
-  import { LoginForm } from '../composables/login-form.js';
-  import FlashMessage from '../components/FlashMessage.vue';
+  import { LoginForm } from '../../composables/login-form.js';
+  import FlashMessage from '../../components/FlashMessage.vue';
   const { form, formMapping, globalErrorMsg, validateField, submitLogin } = LoginForm()
 
   const usernameRules = [

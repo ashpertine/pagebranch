@@ -1,6 +1,6 @@
 <script setup> 
   import { ref } from 'vue';
-  import { createLogoutRequest } from "../api/auth-api.js";
+  import { createLogoutRequest } from "../../api/auth-api.js";
   import { useRouter } from 'vue-router';
   async function logout() {
     const response = await createLogoutRequest(); 
