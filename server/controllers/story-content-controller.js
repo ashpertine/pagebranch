@@ -53,6 +53,11 @@ async function getStoryContent(req, res) {
       storyId,
     );
 
+    if (passagesResults === null && choicesResults === null) {
+      return res.status(404).json({
+        errorMsg: "Story not found",
+      });
+    }
     return res.status(200).json({
       passages: passagesResults,
       choices: choicesResults,

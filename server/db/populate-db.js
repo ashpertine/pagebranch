@@ -29,6 +29,8 @@ const SQL = `
     story_id INTEGER NOT NULL,
     title VARCHAR(255),
     description VARCHAR(255),
+    pos_x INTEGER NOT NULL DEFAULT 1,
+    pos_y INTEGER NOT NULL DEFAULT 1,
     CONSTRAINT passages_story_fk
       FOREIGN KEY (story_id)
       REFERENCES stories(id)

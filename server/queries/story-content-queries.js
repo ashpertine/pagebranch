@@ -18,6 +18,8 @@ async function setStartPassage(user_id, story_id, passage_id) {
 }
 
 async function getPassagesByStoryId(user_id, story_id) {
+  const isOwner = await storyOwnerCheck(user_id, story_id);
+  if (!isOwner) return null;
   const SQL = `
     SELECT passages.* FROM passages
     INNER JOIN stories ON passages.story_id = stories.id
@@ -78,6 +80,8 @@ async function deletePassageById(user_id, story_id, passage_id) {
 }
 
 async function getChoicesByStoryId(user_id, story_id) {
+  const isOwner = await storyOwnerCheck(user_id, story_id);
+  if (!isOwner) return null;
   const SQL = `
     SELECT choices.* FROM choices
     INNER JOIN passages ON choices.from_passage_id = passages.id 
