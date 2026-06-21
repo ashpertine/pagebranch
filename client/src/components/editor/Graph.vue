@@ -7,7 +7,22 @@
 
   const { addEdges, addNodes } = useVueFlow();
   const count = ref(2);
-  const editorHidden = ref(true);
+  const editorState = ref({
+    hidden: true,
+    expandedState: 'smallSize',
+    expandedSize: {
+      height: "1200",
+      width: "1500"
+    },
+    smallSize: {
+      height: "800",
+      width: "500"
+    }
+  })
+
+  function toggleEditorExpand() {
+    editorState.value.expandedState = editorState.value.expandedState === 'expandedSize' ? 'smallSize' : 'expandedSize';
+  }
 
   const initialNodes = ref([
     { 
@@ -72,14 +87,18 @@
         <v-btn type="button" @click="addNode" color="primary">
           Add
         </v-btn>
-        <v-btn type="button" color="orange" @click="editorHidden = !editorHidden">
+        <v-btn type="button" color="orange" @click="editorState.hidden = !editorState.hidden">
           Editor
         </v-btn>
       </v-container>
     </Panel>
   </VueFlow>
   <v-slide-y-reverse-transition>
-    <MarkdownEditor v-if="!editorHidden" :height="800" :width="500"/>
+    <MarkdownEditor v-if="!editorState.hidden"
+    :height="editorState[editorState.expandedState].height"
+    :width="editorState[editorState.expandedState].width"
+    @toggle-expand="toggleEditorExpand"
+    />
   </v-slide-y-reverse-transition>
 </template>
 <style>
