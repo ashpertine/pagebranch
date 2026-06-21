@@ -1,11 +1,13 @@
 <script setup>
   import { ref, onMounted, computed } from 'vue';
   import PassageNode from "./PassageNode.vue";
+  import MarkdownEditor from "./MarkdownEditor.vue";
   import { Background } from '@vue-flow/background'
   import { useVueFlow, VueFlow, Panel, Position } from '@vue-flow/core';
 
   const { addEdges, addNodes } = useVueFlow();
   const count = ref(2);
+  const editorHidden = ref(true);
 
   const initialNodes = ref([
     { 
@@ -66,11 +68,19 @@
       <PassageNode v-bind="props"/>
      </template> 
     <Panel>
-      <v-btn type="button" @click="addNode" color="primary">
-        Add
-      </v-btn>
+      <v-container class="d-flex ga-4">
+        <v-btn type="button" @click="addNode" color="primary">
+          Add
+        </v-btn>
+        <v-btn type="button" color="orange" @click="editorHidden = !editorHidden">
+          Editor
+        </v-btn>
+      </v-container>
     </Panel>
   </VueFlow>
+  <v-slide-y-reverse-transition>
+    <MarkdownEditor v-if="!editorHidden" :height="800" :width="500"/>
+  </v-slide-y-reverse-transition>
 </template>
 <style>
   @import '@vue-flow/core/dist/style.css';

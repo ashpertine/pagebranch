@@ -6,7 +6,7 @@
   <v-app>
     <EditorAppBar />
     <v-main>
-      <v-container class="w-100 h-75">
+      <v-container fluid class="w-100 h-100">
         <Graph />
       </v-container>
     </v-main>
