@@ -98,6 +98,7 @@
     :height="editorState[editorState.expandedState].height"
     :width="editorState[editorState.expandedState].width"
     @toggle-expand="toggleEditorExpand"
+    @toggle-view="editorState.hidden = !editorState.hidden"
     />
   </v-slide-y-reverse-transition>
 </template>
