@@ -14,7 +14,7 @@ async function createGetStoryContentRequest(story_id) {
 
 async function createMakePassageRequest(story_id, title, description) {
   try {
-    const response = await fetch(`/api/stories/${story_id}/passages/new`, {
+    const response = await fetch(`/api/stories/${story_id}/passage/new`, {
       method: "POST",
       body: JSON.stringify({
         title,
@@ -32,4 +32,30 @@ async function createMakePassageRequest(story_id, title, description) {
     };
   }
 }
-export { createGetStoryContentRequest, createMakePassageRequest };
+
+async function createUpdatePassagesRequest(story_id, passage_arr) {
+  try {
+    // each passage should ontain id, title, description, pos_x, pos_y
+    const response = await fetch(`/api/stories/${story_id}/passage/update`, {
+      method: "PATCH",
+      body: JSON.stringify({
+        passages: passage_arr,
+      }),
+      headers: new Headers({
+        "Content-Type": "application/json",
+      }),
+    });
+
+    return response;
+  } catch (error) {
+    return {
+      responseErr: "Server error. Please try again later" + error.toString(),
+    };
+  }
+}
+
+export {
+  createGetStoryContentRequest,
+  createMakePassageRequest,
+  createUpdatePassagesRequest,
+};

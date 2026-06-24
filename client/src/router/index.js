@@ -4,6 +4,7 @@ import LoginView from "../views/LoginView.vue";
 import HomepageView from "../views/HomepageView.vue";
 import EditorView from "../views/EditorView.vue";
 import { getAuthStatus } from "./router-helpers.js";
+import ErrorView from "@/views/ErrorView.vue";
 
 const routes = [
   {
@@ -25,6 +26,16 @@ const routes = [
     name: "Editor",
     path: "/edit/:storyId",
     component: EditorView,
+  },
+  {
+    name: "ErrorEditor",
+    path: "/edit/notfound",
+    component: ErrorView,
+  },
+  {
+    name: "Error",
+    path: "/:pathMatch(.*)*",
+    component: ErrorView,
   },
 ];
 

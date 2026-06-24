@@ -45,22 +45,30 @@ async function updatePassageById(
   passage_id,
   title,
   description,
+  pos_x,
+  pos_y,
 ) {
   const isOwner = await storyOwnerCheck(user_id, story_id);
   if (!isOwner) return null;
 
+  let cols = [title, description, user_id, passage_id];
+  let updatePosStr = "";
+  if (pos_x) {
+    cols.push(pos_x);
+    updatePosStr += `, pos_x = $${cols.length}`;
+  }
+  if (pos_y) {
+    cols.push(pos_y);
+    updatePosStr += `, pos_y = $${cols.length}`;
+  }
+
   const SQL = `
-    UPDATE passages SET title = $1, description = $2
-    FROM stories WHERE passages.story_id = stories.id AND stories.author_id = $3  AND passages.id = $4
+    UPDATE passages SET title = $1, description = $2${updatePosStr}
+    FROM stories WHERE passages.story_id = stories.id AND stories.author_id = $3 AND passages.id = $4
     RETURNING passages.*
   `;
 
-  const { rows } = await pbPool.query(SQL, [
-    title,
-    description,
-    user_id,
-    passage_id,
-  ]);
+  const { rows } = await pbPool.query(SQL, cols);
 
   return rows;
 }

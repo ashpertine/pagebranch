@@ -56,9 +56,9 @@ storiesRouter.post(
 );
 
 storiesRouter.patch(
-  "/stories/:storyId/passage/:passageId/update",
+  "/stories/:storyId/passage/update",
   checkAuthenticated,
-  storyContentController.updatePassage,
+  storyContentController.updatePassages,
 );
 
 storiesRouter.delete(

@@ -100,28 +100,50 @@ async function postNewPassage(req, res) {
   }
 }
 
-async function updatePassage(req, res) {
+async function updatePassages(req, res) {
   try {
     const userId = req.session.passport.user;
     const storyId = req.params.storyId;
-    const passageId = req.params.passageId;
-    let { title, description } = req.body;
-    title = title ?? null;
-    description = description ?? null;
 
-    const results = await storyContentQueries.updatePassageById(
-      userId,
-      storyId,
-      passageId,
-      title,
-      description,
-    );
-    if (results === null) {
-      return res.status(404).json({
-        errorMsg: "Passage not found",
-      });
+    const { passages } = req.body;
+
+    const results = (
+      await Promise.all(
+        passages.map(async (passage) => {
+          console.log("passage: ", passage);
+          let { id, title, description, pos_x, pos_y } = passage;
+          id = id ?? null;
+          title = title ?? null;
+          description = description ?? null;
+          pos_x = pos_x != null ? Math.round(Number(pos_x)) : null;
+          pos_y = pos_y != null ? Math.round(Number(pos_y)) : null;
+
+          console.log("title:", title);
+
+          return await storyContentQueries.updatePassageById(
+            userId,
+            storyId,
+            id,
+            title,
+            description,
+            pos_x,
+            pos_y,
+          );
+        }),
+      )
+    ).flat();
+
+    let notFoundMsgs = [];
+    for (let i = 0; i < passages.length; i++) {
+      if (results[i] === null)
+        notFoundMsgs.push(`Passage (id: ${passages[i].id})`);
     }
 
+    if (notFoundMsgs.length > 0) {
+      return res.status(404).json({
+        errorMsg: notFoundMsgs,
+      });
+    }
     return res.status(200).json(results);
   } catch (error) {
     console.error(error);
@@ -280,7 +302,7 @@ export default {
   updateStartPassage,
   getStoryContent,
   postNewPassage,
-  updatePassage,
+  updatePassages,
   deletePassage,
   postNewChoice,
   updateChoice,
