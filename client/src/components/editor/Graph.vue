@@ -5,9 +5,31 @@ import MarkdownEditor from "./MarkdownEditor.vue";
 import { Background } from '@vue-flow/background'
 import { useVueFlow, VueFlow, Panel, Position } from '@vue-flow/core';
 
-const { addEdges, addNodes, onNodeDragStop, onNodeDragStart } = useVueFlow();
+const { addEdges, addNodes, onNodeClick, onNodeDragStop, onNodeDragStart } = useVueFlow();
 const props = defineProps(["storyContent"]);
-const emit = defineEmits(["create-new-passage", "update-pos-passage"]);
+const emit = defineEmits(["create-new-passage", "update-passage"]);
+
+// Current data. These should not change during the session until user saves.
+const nodes = computed(() =>
+  props.storyContent.passages.map(passage => ({
+    id: `${passage.id}`,
+    position: { x: passage.pos_x ?? 120, y: passage.pos_y ?? 120 },
+    type: "passage",
+    label: passage.title,
+    data: { title: passage.title, description: passage.description, isSelected: Number(passage.id) === Number(selectedPassage.value) },
+    sourcePosition: Position.Bottom,
+    targetPosition: Position.Top
+  }))
+)
+
+const edges = computed(() =>
+  props.storyContent.choices.map(choice => ({
+    id: `${choice.id}`,
+    source: `${choice.from_passage_id}`,
+    target: `${choice.to_passage_id}`
+  }))
+)
+
 
 
 const editorState = ref({
@@ -22,32 +44,36 @@ const editorState = ref({
     width: "500"
   }
 })
-
+const editorContent = ref("");
+const editorTitleContent = ref("");
+const selectedPassage = ref(0);
 
 function toggleEditorExpand() {
   editorState.value.expandedState = editorState.value.expandedState === 'expandedSize' ? 'smallSize' : 'expandedSize';
 }
 
-// Current data. These should not change during the session until user saves.
-const nodes = computed(() =>
-  props.storyContent.passages.map(passage => ({
-    id: `${passage.id}`,
-    position: { x: passage.pos_x ?? 50, y: passage.pos_y ?? 50 },
-    type: "passage",
-    label: passage.title,
-    data: { title: passage.title, description: passage.description },
-    sourcePosition: Position.Bottom,
-    targetPosition: Position.Top
-  }))
-)
+function updateEditorContent(propData) {
+  editorTitleContent.value = propData;
+  const selectedPassageNode = nodes.value.find((passageNode) => Number(passageNode.id) === Number(selectedPassage.value));
+  updatedNodes.value.push({
+    id: selectedPassageNode.id,
+    title: editorTitleContent.value,
+    description: editorContent.value,
+    pos_x: selectedPassageNode.position.x,
+    pos_y: selectedPassageNode.position.y
+  })
 
-const edges = computed(() =>
-  props.storyContent.choices.map(choice => ({
-    id: `${choice.id}`,
-    source: `${choice.from_passage_id}`,
-    target: `${choice.to_passage_id}`
-  }))
-)
+  Debounce.saveDebounce()
+}
+
+function setSelectedPassage(passageId, nodeData) {
+  if (editorState.value.hidden) {
+    editorState.value.hidden = false
+  }
+  editorTitleContent.value = nodeData.title
+  editorContent.value = nodeData.description;
+  selectedPassage.value = passageId;
+}
 
 // Temporarily Store new or updated data
 const updatedNodes = ref([]);
@@ -62,10 +88,9 @@ class Debounce {
   }
   static saveDebounce() {
     this.timeoutId = setTimeout(() => {
-      emit('update-pos-passage', updatedNodes.value);
+      emit('update-passage', updatedNodes.value);
       updatedNodes.value = [];
-    }, 750);
-
+    }, 200);
   }
 
   static cancelDebounce() {
@@ -88,6 +113,12 @@ onNodeDragStart((event) => {
   Debounce.cancelDebounce();
 })
 
+onNodeClick((event) => {
+  const passageId = event.node.id;
+  const data = event.node.data;
+  setSelectedPassage(passageId, data);
+})
+
 </script>
 <template>
   <VueFlow :nodes="nodes" :edges="edges">
@@ -100,16 +131,15 @@ onNodeDragStart((event) => {
         <v-btn type="button" @click="addNode" color="primary">
           Add
         </v-btn>
-        <v-btn type="button" color="orange" @click="editorState.hidden = !editorState.hidden">
-          Editor
-        </v-btn>
       </v-container>
     </Panel>
   </VueFlow>
   <v-slide-y-reverse-transition>
     <MarkdownEditor v-if="!editorState.hidden" :height="editorState[editorState.expandedState].height"
       :width="editorState[editorState.expandedState].width" @toggle-expand="toggleEditorExpand"
-      @toggle-view="editorState.hidden = !editorState.hidden" />
+      :editor-title-content="editorTitleContent" :editor-content="editorContent"
+      @toggle-view="editorState.hidden = !editorState.hidden; selectedPassage = 0"
+      @content-updated="updateEditorContent" />
   </v-slide-y-reverse-transition>
 </template>
 <style>

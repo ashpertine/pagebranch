@@ -72,7 +72,7 @@ async function updatePassagesData(data) {
     <v-main>
       <v-container fluid class="w-100 h-100">
         <Graph :story-content="storyContent" @create-new-passage="saveNewPassageData"
-          @update-pos-passage="updatePassagesData" />
+          @update-passage="updatePassagesData" />
       </v-container>
     </v-main>
   </v-app>
