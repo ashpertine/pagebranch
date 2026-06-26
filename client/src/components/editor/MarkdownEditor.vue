@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 const props = defineProps(['height', 'width', 'editor-title-content', 'editor-content']);
-const emit = defineEmits(['toggle-expand', 'toggle-view', 'content-updated'])
+const emit = defineEmits(['toggle-expand', 'toggle-view', 'content-updated', 'passage-selected'])
 
 function insertMd(md) {
   const editor = document.querySelector('.pb-editor');
@@ -15,12 +15,19 @@ function insertMd(md) {
   editor.selectionEnd = posEnd + fullMd.length;
 }
 const editorButtonsDisabled = ref(false);
+
+function sendContentUpdate() {
+  const title = document.querySelector('.pb-editor-title').innerText;
+  const description = document.querySelector('.pb-editor').value;
+
+  emit('content-updated', { title, description });
+}
+
 onMounted(() => {
   const editor = document.querySelector('.pb-editor');
   editor.focus();
 })
 
-const startingEditorTitleContent = ref(props.editorTitleContent) // Passing editorTitleContent directly into h1 tag will cause interference
 </script>
 <template>
   <v-sheet :height="height" :width="width" class="position-absolute right-0 bottom-0 mr-8 mb-8 d-flex flex-column"
@@ -40,13 +47,13 @@ const startingEditorTitleContent = ref(props.editorTitleContent) // Passing edit
 
     <v-container fluid>
       <h1 contenteditable="true" @focus="editorButtonsDisabled = true" @focusout="editorButtonsDisabled = false"
-        @keydown.enter="(event) => event.preventDefault()" class="pb-editor-title"
-        @keydown="(event) => emit('content-updated', event.target.innerText)"> {{ startingEditorTitleContent }}</h1>
+        @keydown.enter="(event) => event.preventDefault()" class="pb-editor-title" @keyup="sendContentUpdate">{{
+          editorTitleContent }}</h1>
     </v-container>
     <hr class="pb-editor-seperator">
     <v-container fluid class="d-flex flex-column flex-grow-1 overflow-y-scroll ">
-      <textarea class="pb-editor" @keydown="(event) => emit('content-updated', event.target.value)"
-        @keydown.escape="emit('toggle-view')"></textarea>
+      <textarea class="pb-editor" @keyup="sendContentUpdate" @keydown.escape="emit('toggle-view')"
+        :value="editorContent"></textarea>
     </v-container>
   </v-sheet>
 </template>

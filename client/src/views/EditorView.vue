@@ -23,6 +23,39 @@ const storyContent = ref({
   choices: []
 });
 
+function editPassageData(passage_id, options) {
+  for (let passage of storyContent.value.passages) {
+    if (passage.id === passage_id) {
+      for (const [option, value] of Object.entries(options)) {
+        passage[option] = value;
+      }
+    }
+  }
+}
+
+const editorSelectedPassage = ref(0);
+
+function setSelectedPassage(propData) {
+  const { passageId } = propData;
+  editorSelectedPassage.value = Number(passageId);
+}
+
+function setPosition(propData) {
+  const { passageId, pos_x, pos_y } = propData;
+  editPassageData(passageId, {
+    "pos_x": pos_x,
+    "pos_y": pos_y
+  })
+}
+
+function setPassageContent(propData) {
+  const { title, description } = propData;
+  editPassageData(editorSelectedPassage.value, {
+    "title": title,
+    "description": description,
+  })
+}
+
 async function getContent() {
   const response = await createGetStoryContentRequest(route.params.storyId);
   const content = await response.json();
@@ -41,28 +74,21 @@ onMounted(async () => {
   storyContent.value = content;
 })
 
+
 async function saveNewPassageData() {
   const response = await createMakePassageRequest(route.params.storyId, newNodeData.data.title, newNodeData.data.description);
   if (response.ok) {
-    const newContent = await getContent();
-    storyContent.value = newContent;
+    const content = await getContent()
+    if (content.errorMsg) {
+      return router.replace({ name: "ErrorEditor" });
+    }
+    storyContent.value = content;
+    console.log(storyContent.value);
   }
 }
 
-async function updatePassagesData(data) {
-  const dataFormatted = data.map(x => ({
-    id: x.id,
-    title: x.title,
-    description: x.description,
-    pos_x: x.pos_x,
-    pos_y: x.pos_y
-  }))
-
-  const response = await createUpdatePassagesRequest(route.params.storyId, dataFormatted);
-  if (response.ok) {
-    const newContent = await getContent();
-    storyContent.value = newContent;
-  }
+async function saveUpdatedPassages() {
+  const response = await createUpdatePassagesRequest(route.params.storyId, storyContent.value.passages);
 }
 
 </script>
@@ -72,7 +98,8 @@ async function updatePassagesData(data) {
     <v-main>
       <v-container fluid class="w-100 h-100">
         <Graph :story-content="storyContent" @create-new-passage="saveNewPassageData"
-          @update-passage="updatePassagesData" />
+          @save-content="saveUpdatedPassages" :editor-selected-passage="editorSelectedPassage"
+          @select-passage="setSelectedPassage" @position-modified="setPosition" @update-passage="setPassageContent" />
       </v-container>
     </v-main>
   </v-app>

@@ -1,24 +1,23 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, computed } from 'vue';
 import PassageNode from "./PassageNode.vue";
 import MarkdownEditor from "./MarkdownEditor.vue";
 import { Background } from '@vue-flow/background'
 import { useVueFlow, VueFlow, Panel, Position } from '@vue-flow/core';
 
-const { addEdges, addNodes, onNodeClick, onNodeDragStop, onNodeDragStart } = useVueFlow();
-const props = defineProps(["storyContent"]);
-const emit = defineEmits(["create-new-passage", "update-passage"]);
+const { onNodeClick, onNodeDragStop, onNodeDragStart } = useVueFlow();
+const props = defineProps(["story-content", "editor-selected-passage"]);
+const emit = defineEmits(["create-new-passage", "update-passage", "save-content", "select-passage", "position-modified"]);
 
-// Current data. These should not change during the session until user saves.
 const nodes = computed(() =>
   props.storyContent.passages.map(passage => ({
     id: `${passage.id}`,
     position: { x: passage.pos_x ?? 120, y: passage.pos_y ?? 120 },
     type: "passage",
     label: passage.title,
-    data: { title: passage.title, description: passage.description, isSelected: Number(passage.id) === Number(selectedPassage.value) },
+    data: { title: passage.title, description: passage.description, isSelected: props.editorSelectedPassage === passage.id },
     sourcePosition: Position.Bottom,
-    targetPosition: Position.Top
+    targetPosition: Position.Top,
   }))
 )
 
@@ -30,7 +29,13 @@ const edges = computed(() =>
   }))
 )
 
-
+const currentlySelectedPassageData = computed(() => {
+  const passage = props.storyContent.passages.find(p => Number(p.id) === Number(props.editorSelectedPassage));
+  return {
+    title: passage.title,
+    description: passage.description
+  }
+})
 
 const editorState = ref({
   hidden: true,
@@ -44,53 +49,32 @@ const editorState = ref({
     width: "500"
   }
 })
-const editorContent = ref("");
-const editorTitleContent = ref("");
-const selectedPassage = ref(0);
+
 
 function toggleEditorExpand() {
   editorState.value.expandedState = editorState.value.expandedState === 'expandedSize' ? 'smallSize' : 'expandedSize';
 }
 
-function updateEditorContent(propData) {
-  editorTitleContent.value = propData;
-  const selectedPassageNode = nodes.value.find((passageNode) => Number(passageNode.id) === Number(selectedPassage.value));
-  updatedNodes.value.push({
-    id: selectedPassageNode.id,
-    title: editorTitleContent.value,
-    description: editorContent.value,
-    pos_x: selectedPassageNode.position.x,
-    pos_y: selectedPassageNode.position.y
+function updateEditorContent(editorData) {
+  Debounce.cancelDebounce();
+  emit('update-passage', {
+    title: editorData.title,
+    description: editorData.description
   })
-
-  Debounce.saveDebounce()
+  Debounce.saveDebounce(1000);
 }
-
-function setSelectedPassage(passageId, nodeData) {
-  if (editorState.value.hidden) {
-    editorState.value.hidden = false
-  }
-  editorTitleContent.value = nodeData.title
-  editorContent.value = nodeData.description;
-  selectedPassage.value = passageId;
-}
-
-// Temporarily Store new or updated data
-const updatedNodes = ref([]);
 
 function addNode() {
   emit('create-new-passage');
 }
 
 class Debounce {
-  constructor() {
-    this.timeoutId = null;
-  }
-  static saveDebounce() {
+  static timeoutId = null;;
+
+  static saveDebounce(debounce_time) {
     this.timeoutId = setTimeout(() => {
-      emit('update-passage', updatedNodes.value);
-      updatedNodes.value = [];
-    }, 200);
+      emit('save-content');
+    }, debounce_time);
   }
 
   static cancelDebounce() {
@@ -99,24 +83,25 @@ class Debounce {
 }
 
 onNodeDragStop((event) => {
-  updatedNodes.value.push({
-    id: event.node.id,
-    title: event.node.data.title,
-    description: event.node.data.description,
+  emit('position-modified', {
+    passageId: Number(event.node.id),
     pos_x: event.node.position.x,
     pos_y: event.node.position.y
-  })
-  Debounce.saveDebounce();
+  });
+  Debounce.saveDebounce(200);
 })
 
-onNodeDragStart((event) => {
+onNodeDragStart(() => {
   Debounce.cancelDebounce();
 })
 
 onNodeClick((event) => {
-  const passageId = event.node.id;
-  const data = event.node.data;
-  setSelectedPassage(passageId, data);
+  if (editorState.value.hidden) {
+    editorState.value.hidden = false
+  }
+  emit('select-passage', {
+    passageId: Number(event.node.id)
+  });
 })
 
 </script>
@@ -137,8 +122,9 @@ onNodeClick((event) => {
   <v-slide-y-reverse-transition>
     <MarkdownEditor v-if="!editorState.hidden" :height="editorState[editorState.expandedState].height"
       :width="editorState[editorState.expandedState].width" @toggle-expand="toggleEditorExpand"
-      :editor-title-content="editorTitleContent" :editor-content="editorContent"
-      @toggle-view="editorState.hidden = !editorState.hidden; selectedPassage = 0"
+      :editor-title-content="currentlySelectedPassageData.title"
+      :editor-content="currentlySelectedPassageData.description"
+      @toggle-view="editorState.hidden = !editorState.hidden; emit('select-passage', { passageId: 0 })"
       @content-updated="updateEditorContent" />
   </v-slide-y-reverse-transition>
 </template>
