@@ -11,7 +11,7 @@ async function updateStartPassage(req, res) {
       });
     }
 
-    const results = await storyContentQueries.setStartPassage(
+    const results = await storyContentQueries.setStartPassageByStory(
       userId,
       storyId,
       startPassageId,
@@ -23,13 +23,44 @@ async function updateStartPassage(req, res) {
       });
     } else if (results.length === 0) {
       return res.status(404).json({
-        errorMsg: "Passage likely does not exist",
+        errorMsg: "No passage found",
       });
     }
 
     return res.status(200).json({
       okMsg: `new start passage id set: ${startPassageId}`,
-      results,
+      results: results[0],
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      errorMsg: error.toString(),
+    });
+  }
+}
+
+async function getStartPassage(req, res) {
+  try {
+    const userId = req.session.passport.user;
+    const storyId = req.params.storyId;
+
+    const results = await storyContentQueries.getStartPassageByStory(
+      userId,
+      storyId,
+    );
+    if (results === null) {
+      return res.status(404).json({
+        errorMsg: "Story not found",
+      });
+    } else if (results.length === 0) {
+      return res.status(404).json({
+        errorMsg: "No passage found",
+      });
+    }
+
+    return res.status(200).json({
+      okMsg: `start passage found: ${results[0]}`,
+      results: results[0],
     });
   } catch (error) {
     console.error(error);
@@ -300,6 +331,7 @@ async function deleteChoice(req, res) {
 
 export default {
   updateStartPassage,
+  getStartPassage,
   getStoryContent,
   postNewPassage,
   updatePassages,

@@ -1,19 +1,30 @@
 import { pbPool } from "../db/pool.js";
 import { storyOwnerCheck } from "./role-queries.js";
 
-async function setStartPassage(user_id, story_id, passage_id) {
+async function setStartPassageByStory(user_id, story_id, passage_id) {
   const isOwner = await storyOwnerCheck(user_id, story_id);
   if (!isOwner) return null;
   const SQL = `
-    UPDATE stories SET start_passage_id = $1, updated_at = now()
+    UPDATE stories SET start_passage_id = $1
     WHERE author_id = $2 AND id = $3 AND 
       EXISTS (
         SELECT 1 FROM passages WHERE passages.id = $1
       )
-    RETURNING *
+    RETURNING start_passage_id
   `;
 
   const { rows } = await pbPool.query(SQL, [passage_id, user_id, story_id]);
+  return rows;
+}
+
+async function getStartPassageByStory(user_id, story_id) {
+  const isOwner = await storyOwnerCheck(user_id, story_id);
+  if (!isOwner) return null;
+  const SQL = `
+    SELECT start_passage_id FROM stories WHERE author_id = $1 AND id = $2
+  `;
+
+  const { rows } = await pbPool.query(SQL, [user_id, story_id]);
   return rows;
 }
 
@@ -210,7 +221,8 @@ async function deleteChoiceById(user_id, story_id, choice_id) {
 }
 
 export default {
-  setStartPassage,
+  setStartPassageByStory,
+  getStartPassageByStory,
   getPassagesByStoryId,
   insertNewPassage,
   updatePassageById,

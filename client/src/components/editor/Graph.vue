@@ -8,8 +8,18 @@ import { Background } from '@vue-flow/background'
 import { useVueFlow, VueFlow, Panel, Position } from '@vue-flow/core';
 
 const { onNodeClick, onNodeDragStop, onNodeDragStart, onEdgeDoubleClick } = useVueFlow();
-const props = defineProps(["story-content", "editor-selected-passage"]);
-const emit = defineEmits(["create-new-passage", "update-passage", "save-content", "select-passage", "position-modified", "delete-passage", "create-new-choice", "update-choice", "delete-choice"]);
+const props = defineProps(["story-content", "editor-selected-passage", "start-passage"]);
+const emit = defineEmits([
+  "create-new-passage",
+  "update-passage",
+  "save-content",
+  "select-passage",
+  "position-modified",
+  "delete-passage",
+  "create-new-choice",
+  "update-choice",
+  "delete-choice",
+  "set-start-passage"]);
 
 class Debounce {
   static timeoutId = null;;
@@ -24,7 +34,6 @@ class Debounce {
     clearTimeout(this.timeoutId);
   }
 }
-
 
 const nodes = computed(() =>
   props.storyContent.passages.map(passage => ({
@@ -75,6 +84,19 @@ const editorState = ref({
     width: "500"
   }
 })
+
+const elligbleForSetStart = computed(() => {
+  const isPassageSelected = props.editorSelectedPassage !== 0
+  const isSelectedNotStart = props.editorSelectedPassage !== props.startPassage
+
+  return isPassageSelected && isSelectedNotStart;
+})
+
+function setStartingPassage() {
+  emit('set-start-passage', {
+    passageId: props.editorSelectedPassage
+  })
+}
 
 
 function toggleEditorExpand() {
@@ -245,6 +267,8 @@ function deleteChoice() {
             </v-card>
           </template>
         </v-dialog>
+        <v-btn v-if="elligbleForSetStart" type="button" color="success" text="Set Start Passage"
+          @click="setStartingPassage" size="large"></v-btn>
       </v-container>
     </Panel>
   </VueFlow>

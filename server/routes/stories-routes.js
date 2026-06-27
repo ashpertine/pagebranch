@@ -44,6 +44,12 @@ storiesRouter.patch(
 );
 
 storiesRouter.get(
+  "/stories/:storyId/get-start/",
+  checkAuthenticated,
+  storyContentController.getStartPassage,
+);
+
+storiesRouter.get(
   "/stories/:storyId",
   checkAuthenticated,
   storyContentController.getStoryContent,

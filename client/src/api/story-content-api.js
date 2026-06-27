@@ -152,6 +152,40 @@ async function createDeleteChoiceRequest(story_id, choice_id) {
   }
 }
 
+async function createSetStartPassageRequest(story_id, passage_id) {
+  try {
+    const response = await fetch(`/api/stories/${story_id}/update-start/`, {
+      method: "PATCH",
+      body: JSON.stringify({
+        passageId: passage_id,
+      }),
+      headers: new Headers({
+        "Content-Type": "application/json",
+      }),
+    });
+
+    return response;
+  } catch (error) {
+    return {
+      responseErr: "Server error. Please try again later" + error.toString(),
+    };
+  }
+}
+
+async function createGetStartPassageRequest(story_id) {
+  try {
+    const response = await fetch(`/api/stories/${story_id}/get-start/`, {
+      method: "GET",
+    });
+
+    return response;
+  } catch (error) {
+    return {
+      responseErr: "Server error. Please try again later" + error.toString(),
+    };
+  }
+}
+
 export {
   createGetStoryContentRequest,
   createMakePassageRequest,
@@ -160,4 +194,6 @@ export {
   createMakeChoiceRequest,
   createUpdateChoiceRequest,
   createDeleteChoiceRequest,
+  createSetStartPassageRequest,
+  createGetStartPassageRequest,
 };

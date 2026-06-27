@@ -1,7 +1,17 @@
 <script setup>
 import Graph from "../components/editor/Graph.vue";
 import EditorAppBar from "../components/editor/EditorAppBar.vue";
-import { createGetStoryContentRequest, createMakePassageRequest, createUpdatePassagesRequest, createDeletePassageRequest, createMakeChoiceRequest, createUpdateChoiceRequest, createDeleteChoiceRequest } from "@/api/story-content-api";
+import {
+  createGetStoryContentRequest,
+  createMakePassageRequest,
+  createUpdatePassagesRequest,
+  createDeletePassageRequest,
+  createMakeChoiceRequest,
+  createUpdateChoiceRequest,
+  createDeleteChoiceRequest,
+  createSetStartPassageRequest,
+  createGetStartPassageRequest
+} from "@/api/story-content-api";
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { Position } from "@vue-flow/core";
@@ -22,6 +32,8 @@ const storyContent = ref({
   passages: [],
   choices: []
 });
+
+const startPassage = ref(0);
 
 function editPassageData(passage_id, options) {
   for (let passage of storyContent.value.passages) {
@@ -60,19 +72,31 @@ async function getContent() {
   const response = await createGetStoryContentRequest(route.params.storyId);
   const content = await response.json();
   if (response.responseErr) {
-    return router.replace({ name: "Error" })
+    return router.replace({ name: "ErrorEditor" })
   }
   return content;
 }
 
-onMounted(async () => {
-  const content = await getContent()
-  if (content.errorMsg) {
-    return router.replace({ name: "ErrorEditor" });
+async function initStartPassage() {
+  const response = await createGetStartPassageRequest(route.params.storyId);
+  const content = await response.json();
+  if (response.responseErr) {
+    return router.replace({ name: "ErrorEditor" })
   }
 
-  storyContent.value = content;
-})
+  return content.results.start_passage_id;
+}
+
+
+async function saveStartPassage() {
+  const response = await createSetStartPassageRequest(route.params.storyId, editorSelectedPassage.value);
+  const content = await response.json();
+  if (response.responseErr) {
+    return router.replace({ name: "ErrorEditor" })
+  }
+
+  startPassage.value = content.results.start_passage_id;
+}
 
 
 async function saveNewPassageData() {
@@ -145,6 +169,18 @@ async function saveDeleteChoiceData(propData) {
   }
 }
 
+
+onMounted(async () => {
+  const content = await getContent()
+  const startPassageResult = await initStartPassage();
+  if (content.errorMsg || startPassageResult.errorMsg) {
+    return router.replace({ name: "ErrorEditor" });
+  }
+
+  storyContent.value = content;
+  startPassage.value = startPassageResult;
+})
+
 </script>
 <template>
   <v-app>
@@ -152,10 +188,11 @@ async function saveDeleteChoiceData(propData) {
     <v-main>
       <v-container fluid class="w-100 h-100">
         <Graph :story-content="storyContent" :editor-selected-passage="editorSelectedPassage"
-          @create-new-passage="saveNewPassageData" @save-content="saveUpdatedPassages"
+          :start-passage="startPassage" @create-new-passage="saveNewPassageData" @save-content="saveUpdatedPassages"
           @select-passage="setSelectedPassage" @position-modified="setPosition" @update-passage="setPassageContent"
           @delete-passage="saveDeletePassage" @create-new-choice="saveNewChoiceData"
-          @update-choice="saveUpdateChoiceData" @delete-choice="saveDeleteChoiceData" />
+          @update-choice="saveUpdateChoiceData" @delete-choice="saveDeleteChoiceData"
+          @set-start-passage="saveStartPassage" />
       </v-container>
     </v-main>
   </v-app>

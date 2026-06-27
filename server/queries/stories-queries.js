@@ -36,7 +36,7 @@ async function deleteStoryById(user_id, story_id) {
 }
 
 async function updateStoryById(user_id, story_id, story_title) {
-  const SQL = `UPDATE stories SET story_title = $1, updated_at = now() WHERE id = $2 AND author_id = $3 RETURNING *`;
+  const SQL = `UPDATE stories SET story_title = $1 WHERE id = $2 AND author_id = $3 RETURNING *`;
   const { rows } = await pbPool.query(SQL, [story_title, story_id, user_id]);
   return rows;
 }
