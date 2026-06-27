@@ -1,5 +1,5 @@
 <script setup>
-  import RegisterRegisterBox from '../components/auth/RegisterBox.vue';  
+import RegisterBox from '../components/auth/RegisterBox.vue';  
 </script>
 <template>
   <v-app>
@@ -8,5 +8,4 @@
     </v-container>
   </v-app>
 </template>
-<style scoped>
-</style>
+<style scoped></style>
