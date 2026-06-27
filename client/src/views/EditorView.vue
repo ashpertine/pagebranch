@@ -1,7 +1,7 @@
 <script setup>
 import Graph from "../components/editor/Graph.vue";
 import EditorAppBar from "../components/editor/EditorAppBar.vue";
-import { createGetStoryContentRequest, createMakePassageRequest, createUpdatePassagesRequest } from "@/api/story-content-api";
+import { createGetStoryContentRequest, createMakePassageRequest, createUpdatePassagesRequest, createDeletePassageRequest } from "@/api/story-content-api";
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { Position } from "@vue-flow/core";
@@ -83,12 +83,24 @@ async function saveNewPassageData() {
       return router.replace({ name: "ErrorEditor" });
     }
     storyContent.value = content;
-    console.log(storyContent.value);
   }
 }
 
 async function saveUpdatedPassages() {
   const response = await createUpdatePassagesRequest(route.params.storyId, storyContent.value.passages);
+}
+
+async function saveDeletePassage() {
+  const passageDeleted = editorSelectedPassage.value;
+  editorSelectedPassage.value = 0;
+  const response = await createDeletePassageRequest(route.params.storyId, passageDeleted);
+  if (response.ok) {
+    const content = await getContent()
+    if (content.errorMsg) {
+      return router.replace({ name: "ErrorEditor" });
+    }
+    storyContent.value = content;
+  }
 }
 
 </script>
@@ -99,7 +111,8 @@ async function saveUpdatedPassages() {
       <v-container fluid class="w-100 h-100">
         <Graph :story-content="storyContent" @create-new-passage="saveNewPassageData"
           @save-content="saveUpdatedPassages" :editor-selected-passage="editorSelectedPassage"
-          @select-passage="setSelectedPassage" @position-modified="setPosition" @update-passage="setPassageContent" />
+          @select-passage="setSelectedPassage" @position-modified="setPosition" @update-passage="setPassageContent"
+          @delete-passage="saveDeletePassage" />
       </v-container>
     </v-main>
   </v-app>

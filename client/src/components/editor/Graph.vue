@@ -7,7 +7,7 @@ import { useVueFlow, VueFlow, Panel, Position } from '@vue-flow/core';
 
 const { onNodeClick, onNodeDragStop, onNodeDragStart } = useVueFlow();
 const props = defineProps(["story-content", "editor-selected-passage"]);
-const emit = defineEmits(["create-new-passage", "update-passage", "save-content", "select-passage", "position-modified"]);
+const emit = defineEmits(["create-new-passage", "update-passage", "save-content", "select-passage", "position-modified", "delete-passage"]);
 
 const nodes = computed(() =>
   props.storyContent.passages.map(passage => ({
@@ -30,10 +30,17 @@ const edges = computed(() =>
 )
 
 const currentlySelectedPassageData = computed(() => {
-  const passage = props.storyContent.passages.find(p => Number(p.id) === Number(props.editorSelectedPassage));
-  return {
-    title: passage.title,
-    description: passage.description
+  if (props.editorSelectedPassage !== 0) {
+    const passage = props.storyContent.passages.find(p => Number(p.id) === Number(props.editorSelectedPassage));
+    return {
+      title: passage.title,
+      description: passage.description
+    }
+  } else {
+    return {
+      title: '',
+      description: ''
+    }
   }
 })
 
@@ -68,6 +75,11 @@ function addNode() {
   emit('create-new-passage');
 }
 
+function deleteNode() {
+  editorState.value.hidden = true;
+  emit('delete-passage');
+}
+
 class Debounce {
   static timeoutId = null;;
 
@@ -96,12 +108,21 @@ onNodeDragStart(() => {
 })
 
 onNodeClick((event) => {
-  if (editorState.value.hidden) {
-    editorState.value.hidden = false
+  if (props.editorSelectedPassage === Number(event.node.id)) {
+    if (!editorState.value.hidden) {
+      editorState.value.hidden = true
+    }
+    emit('select-passage', {
+      passageId: 0
+    });
+  } else {
+    if (editorState.value.hidden) {
+      editorState.value.hidden = false
+    }
+    emit('select-passage', {
+      passageId: Number(event.node.id)
+    });
   }
-  emit('select-passage', {
-    passageId: Number(event.node.id)
-  });
 })
 
 </script>
@@ -113,9 +134,28 @@ onNodeClick((event) => {
     </template>
     <Panel>
       <v-container class="d-flex ga-4">
-        <v-btn type="button" @click="addNode" color="primary">
-          Add
+        <v-btn type="button" @click="addNode" color="primary" icon="mdi-plus">
         </v-btn>
+        <v-dialog max-width="500">
+          <template v-slot:activator="{ props: activatorProps }">
+            <v-btn type="button" v-bind="activatorProps" icon="mdi-delete" color="error"
+              :readonly="editorSelectedPassage === 0" :variant="editorSelectedPassage === 0 ? 'outlined' : 'flat'">
+            </v-btn>
+          </template>
+          <template v-slot:default="{ isActive }">
+            <v-card title="Delete Passage">
+              <v-card-text>
+                Are you sure you want to delete this passage? This action is irreversible.
+              </v-card-text>
+
+              <v-card-actions>
+                <v-btn text="Close" @click="isActive.value = false" size="large"></v-btn>
+                <v-btn text="Yes" size="large" variant="tonal" color="error"
+                  @click="isActive.value = false; emit('delete-passage')"></v-btn>
+              </v-card-actions>
+            </v-card>
+          </template>
+        </v-dialog>
       </v-container>
     </Panel>
   </VueFlow>

@@ -54,8 +54,29 @@ async function createUpdatePassagesRequest(story_id, passage_arr) {
   }
 }
 
+async function createDeletePassageRequest(story_id, passage_id) {
+  try {
+    const response = await fetch(
+      `/api/stories/${story_id}/passage/${passage_id}/delete`,
+      {
+        method: "DELETE",
+        headers: new Headers({
+          "Content-Type": "application/json",
+        }),
+      },
+    );
+
+    return response;
+  } catch (error) {
+    return {
+      responseErr: "Server error. Please try again later" + error.toString(),
+    };
+  }
+}
+
 export {
   createGetStoryContentRequest,
   createMakePassageRequest,
   createUpdatePassagesRequest,
+  createDeletePassageRequest,
 };
