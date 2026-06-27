@@ -66,7 +66,7 @@ onMounted(() => {
     </v-container>
     <hr class="pb-editor-seperator">
     <v-container fluid class="d-flex flex-column flex-grow-1 overflow-y-scroll ">
-      <textarea class="pb-editor" @keyup="sendContentUpdate" @keydown.escape="emit('toggle-view')"
+      <textarea class="pb-editor" @keyup="sendContentUpdate" @keyup.escape="emit('toggle-view')"
         :value="editorContent"></textarea>
     </v-container>
   </v-sheet>

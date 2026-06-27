@@ -1,7 +1,7 @@
 <script setup>
 import Graph from "../components/editor/Graph.vue";
 import EditorAppBar from "../components/editor/EditorAppBar.vue";
-import { createGetStoryContentRequest, createMakePassageRequest, createUpdatePassagesRequest, createDeletePassageRequest } from "@/api/story-content-api";
+import { createGetStoryContentRequest, createMakePassageRequest, createUpdatePassagesRequest, createDeletePassageRequest, createMakeChoiceRequest, createUpdateChoiceRequest, createDeleteChoiceRequest } from "@/api/story-content-api";
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { Position } from "@vue-flow/core";
@@ -103,16 +103,59 @@ async function saveDeletePassage() {
   }
 }
 
+
+async function saveNewChoiceData(propData) {
+  const defaultLabel = "Untitled Label";
+  const response = await createMakeChoiceRequest(route.params.storyId, defaultLabel, propData.source, propData.target);
+  if (response.ok) {
+    const content = await getContent()
+    if (content.errorMsg) {
+      return router.replace({ name: "ErrorEditor" });
+    }
+    storyContent.value = content;
+  }
+}
+
+
+async function saveUpdateChoiceData(propData) {
+  const { id, newLabel } = propData;
+  const targetChoice = storyContent.value.choices.find(choice => Number(choice.id) === Number(id));
+  const fromPassageId = targetChoice.from_passage_id;
+  const toPassageId = targetChoice.to_passage_id;
+  const response = await createUpdateChoiceRequest(route.params.storyId, targetChoice.id, newLabel, fromPassageId, toPassageId);
+  if (response.ok) {
+    const content = await getContent()
+    if (content.errorMsg) {
+      return router.replace({ name: "ErrorEditor" });
+    }
+    storyContent.value = content;
+  }
+}
+
+
+async function saveDeleteChoiceData(propData) {
+  const { id } = propData;
+  const response = await createDeleteChoiceRequest(route.params.storyId, id);
+  if (response.ok) {
+    const content = await getContent()
+    if (content.errorMsg) {
+      return router.replace({ name: "ErrorEditor" });
+    }
+    storyContent.value = content;
+  }
+}
+
 </script>
 <template>
   <v-app>
     <EditorAppBar />
     <v-main>
       <v-container fluid class="w-100 h-100">
-        <Graph :story-content="storyContent" @create-new-passage="saveNewPassageData"
-          @save-content="saveUpdatedPassages" :editor-selected-passage="editorSelectedPassage"
+        <Graph :story-content="storyContent" :editor-selected-passage="editorSelectedPassage"
+          @create-new-passage="saveNewPassageData" @save-content="saveUpdatedPassages"
           @select-passage="setSelectedPassage" @position-modified="setPosition" @update-passage="setPassageContent"
-          @delete-passage="saveDeletePassage" />
+          @delete-passage="saveDeletePassage" @create-new-choice="saveNewChoiceData"
+          @update-choice="saveUpdateChoiceData" @delete-choice="saveDeleteChoiceData" />
       </v-container>
     </v-main>
   </v-app>

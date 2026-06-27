@@ -74,9 +74,90 @@ async function createDeletePassageRequest(story_id, passage_id) {
   }
 }
 
+async function createMakeChoiceRequest(
+  story_id,
+  label,
+  from_passage_id,
+  to_passage_id,
+) {
+  try {
+    const response = await fetch(`/api/stories/${story_id}/choice/new`, {
+      method: "POST",
+      body: JSON.stringify({
+        label: label,
+        from_passage_id: from_passage_id,
+        to_passage_id: to_passage_id,
+      }),
+      headers: new Headers({
+        "Content-Type": "application/json",
+      }),
+    });
+
+    return response;
+  } catch (error) {
+    return {
+      responseErr: "Server error. Please try again later" + error.toString(),
+    };
+  }
+}
+
+async function createUpdateChoiceRequest(
+  story_id,
+  choice_id,
+  label,
+  from_passage_id,
+  to_passage_id,
+) {
+  try {
+    const response = await fetch(
+      `/api/stories/${story_id}/choice/${choice_id}/update`,
+      {
+        method: "PATCH",
+        body: JSON.stringify({
+          label: label,
+          from_passage_id: from_passage_id,
+          to_passage_id: to_passage_id,
+        }),
+        headers: new Headers({
+          "Content-Type": "application/json",
+        }),
+      },
+    );
+
+    return response;
+  } catch (error) {
+    return {
+      responseErr: "Server error. Please try again later" + error.toString(),
+    };
+  }
+}
+
+async function createDeleteChoiceRequest(story_id, choice_id) {
+  try {
+    const response = await fetch(
+      `/api/stories/${story_id}/choice/${choice_id}/delete`,
+      {
+        method: "DELETE",
+        headers: new Headers({
+          "Content-Type": "application/json",
+        }),
+      },
+    );
+
+    return response;
+  } catch (error) {
+    return {
+      responseErr: "Server error. Please try again later" + error.toString(),
+    };
+  }
+}
+
 export {
   createGetStoryContentRequest,
   createMakePassageRequest,
   createUpdatePassagesRequest,
   createDeletePassageRequest,
+  createMakeChoiceRequest,
+  createUpdateChoiceRequest,
+  createDeleteChoiceRequest,
 };

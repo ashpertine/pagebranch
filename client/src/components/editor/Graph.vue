@@ -1,13 +1,30 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { h, ref, markRaw, computed, onMounted } from 'vue';
 import PassageNode from "./PassageNode.vue";
+import ChoiceEdgeLabel from './ChoiceEdgeLabel.vue';
+import ChoiceEdge from './ChoiceEdge.vue'
 import MarkdownEditor from "./MarkdownEditor.vue";
 import { Background } from '@vue-flow/background'
 import { useVueFlow, VueFlow, Panel, Position } from '@vue-flow/core';
 
-const { onNodeClick, onNodeDragStop, onNodeDragStart } = useVueFlow();
+const { onNodeClick, onNodeDragStop, onNodeDragStart, onEdgeDoubleClick } = useVueFlow();
 const props = defineProps(["story-content", "editor-selected-passage"]);
-const emit = defineEmits(["create-new-passage", "update-passage", "save-content", "select-passage", "position-modified", "delete-passage"]);
+const emit = defineEmits(["create-new-passage", "update-passage", "save-content", "select-passage", "position-modified", "delete-passage", "create-new-choice", "update-choice", "delete-choice"]);
+
+class Debounce {
+  static timeoutId = null;;
+
+  static saveDebounce(debounce_time) {
+    this.timeoutId = setTimeout(() => {
+      emit('save-content');
+    }, debounce_time);
+  }
+
+  static cancelDebounce() {
+    clearTimeout(this.timeoutId);
+  }
+}
+
 
 const nodes = computed(() =>
   props.storyContent.passages.map(passage => ({
@@ -25,7 +42,9 @@ const edges = computed(() =>
   props.storyContent.choices.map(choice => ({
     id: `${choice.id}`,
     source: `${choice.from_passage_id}`,
-    target: `${choice.to_passage_id}`
+    target: `${choice.to_passage_id}`,
+    label: () => h(ChoiceEdgeLabel, { label: `${choice.label}` }),
+    type: "choice"
   }))
 )
 
@@ -80,19 +99,6 @@ function deleteNode() {
   emit('delete-passage');
 }
 
-class Debounce {
-  static timeoutId = null;;
-
-  static saveDebounce(debounce_time) {
-    this.timeoutId = setTimeout(() => {
-      emit('save-content');
-    }, debounce_time);
-  }
-
-  static cancelDebounce() {
-    clearTimeout(this.timeoutId);
-  }
-}
 
 onNodeDragStop((event) => {
   emit('position-modified', {
@@ -106,6 +112,7 @@ onNodeDragStop((event) => {
 onNodeDragStart(() => {
   Debounce.cancelDebounce();
 })
+
 
 onNodeClick((event) => {
   if (props.editorSelectedPassage === Number(event.node.id)) {
@@ -125,12 +132,93 @@ onNodeClick((event) => {
   }
 })
 
+
+
+const labelRules = [
+  value => {
+    if (value) return true;
+    return 'Label is empty!';
+  },
+  value => {
+    if (value?.length > 50) return 'Label cannot be more than 50 characters';
+    return true;
+  }
+]
+
+
+const choiceDialog = ref(false);
+const choiceDialogData = ref({
+  selected: 0,
+  label: ""
+});
+
+const labelForm = ref();
+
+onEdgeDoubleClick((event) => {
+  choiceDialogData.value.selected = Number(event.edge.id);
+  choiceDialog.value = true;
+})
+
+function onConnect(params) {
+  emit('create-new-choice', {
+    source: Number(params.source),
+    target: Number(params.target)
+  })
+}
+
+function hideChoiceDialog() {
+  choiceDialogData.value.selected = 0;
+  choiceDialog.value = false;
+}
+
+async function updateLabel() {
+  const { valid } = await labelForm.value.validate();
+  if (!valid) {
+    return;
+  }
+
+  emit('update-choice', {
+    id: choiceDialogData.value.selected,
+    newLabel: choiceDialogData.value.label
+  });
+  hideChoiceDialog();
+}
+
+function deleteChoice() {
+  emit('delete-choice', {
+    id: choiceDialogData.value.selected
+  });
+  hideChoiceDialog();
+}
+
 </script>
 <template>
-  <VueFlow :nodes="nodes" :edges="edges">
+  <v-dialog v-model="choiceDialog" width="auto" @after-leave="hideChoiceDialog">
+    <v-card prepend-icon="mdi-note-edit" class="px-4 py-4" min-width="600">
+      <v-card-title>Modify Choice</v-card-title>
+      <v-card-subtitle>Change or delete this label</v-card-subtitle>
+      <v-container>
+        <v-form ref="labelForm" @submit.prevent="updateLabel">
+          <v-text-field :counter="50" label="New Label" :rules="labelRules" v-model="choiceDialogData.label"
+            required></v-text-field>
+          <v-card-actions class="justify-start">
+            <v-btn text="Delete" @click="deleteChoice" variant="flat" color="error" size="large"
+              class="me-auto"></v-btn>
+            <v-btn text="Close" @click="hideChoiceDialog()" size="large"></v-btn>
+            <v-btn text="Update" @click="(event) => { event.preventDefault(); updateLabel() }" variant="flat"
+              color="success" size="large"></v-btn>
+          </v-card-actions>
+        </v-form>
+      </v-container>
+    </v-card>
+  </v-dialog>
+  <VueFlow :nodes="nodes" :edges="edges" @connect="onConnect">
     <Background variant="dots" />
     <template #node-passage="props">
       <PassageNode v-bind="props" />
+    </template>
+    <template #edge-choice="props">
+      <ChoiceEdge v-bind="props" />
     </template>
     <Panel>
       <v-container class="d-flex ga-4">
@@ -138,8 +226,9 @@ onNodeClick((event) => {
         </v-btn>
         <v-dialog max-width="500">
           <template v-slot:activator="{ props: activatorProps }">
-            <v-btn type="button" v-bind="activatorProps" icon="mdi-delete" color="error"
-              :readonly="editorSelectedPassage === 0" :variant="editorSelectedPassage === 0 ? 'outlined' : 'flat'">
+            <v-btn type="button" v-bind="activatorProps"
+              :icon="editorSelectedPassage === 0 ? 'mdi-delete-off' : 'mdi-delete'" color="error"
+              :readonly="editorSelectedPassage === 0" :variant="editorSelectedPassage === 0 ? 'tonal' : 'flat'">
             </v-btn>
           </template>
           <template v-slot:default="{ isActive }">
@@ -151,7 +240,7 @@ onNodeClick((event) => {
               <v-card-actions>
                 <v-btn text="Close" @click="isActive.value = false" size="large"></v-btn>
                 <v-btn text="Yes" size="large" variant="tonal" color="error"
-                  @click="isActive.value = false; emit('delete-passage')"></v-btn>
+                  @click="isActive.value = false; deleteNode()"></v-btn>
               </v-card-actions>
             </v-card>
           </template>
