@@ -141,15 +141,12 @@ async function updatePassages(req, res) {
     const results = (
       await Promise.all(
         passages.map(async (passage) => {
-          console.log("passage: ", passage);
           let { id, title, description, pos_x, pos_y } = passage;
           id = id ?? null;
           title = title ?? null;
           description = description ?? null;
           pos_x = pos_x != null ? Math.round(Number(pos_x)) : null;
           pos_y = pos_y != null ? Math.round(Number(pos_y)) : null;
-
-          console.log("title:", title);
 
           return await storyContentQueries.updatePassageById(
             userId,

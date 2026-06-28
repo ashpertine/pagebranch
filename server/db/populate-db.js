@@ -27,8 +27,8 @@ const SQL = `
   CREATE TABLE IF NOT EXISTS passages (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     story_id INTEGER NOT NULL,
-    title VARCHAR(255),
-    description VARCHAR(255),
+    title TEXT,
+    description TEXT,
     pos_x INTEGER NOT NULL DEFAULT 120,
     pos_y INTEGER NOT NULL DEFAULT 120,
     CONSTRAINT passages_story_fk

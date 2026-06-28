@@ -88,6 +88,25 @@ async function deletePassageById(user_id, story_id, passage_id) {
   const isOwner = await storyOwnerCheck(user_id, story_id);
   if (!isOwner) return null;
 
+  const isStartPassageResults = await pbPool.query(
+    "SELECT start_passage_id IS NOT NULL AS is_start_passage FROM stories WHERE author_id = $1 AND start_passage_id = $2",
+    [user_id, passage_id],
+  );
+
+  if (isStartPassageResults.rows[0].is_start_passage) {
+    // nullify start passage
+    await pbPool.query(
+      `
+    UPDATE stories SET start_passage_id = NULL
+    WHERE author_id = $1 AND id = $2 AND 
+      EXISTS (
+        SELECT 1 FROM passages WHERE passages.id = $1
+      )
+    `,
+      [user_id, story_id],
+    );
+  }
+
   const SQL = `
     DELETE FROM passages
     USING stories WHERE passages.story_id = stories.id AND stories.author_id = $1 AND passages.id = $2

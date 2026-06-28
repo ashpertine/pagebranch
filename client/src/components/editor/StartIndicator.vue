@@ -1,7 +1,7 @@
 <template>
   <v-sheet :height="40" :width="150" border color="success" class="d-flex justify-center align-center" rounded>
     <div class="chat-extend"></div>
-    <text-display-small>This is the start.</text-display-small>
+    <div class="text-label-large">This is the start.</div>
   </v-sheet>
 </template>
 <style scoped>

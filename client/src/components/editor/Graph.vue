@@ -72,18 +72,8 @@ const currentlySelectedPassageData = computed(() => {
   }
 })
 
-const editorState = ref({
-  hidden: true,
-  expandedState: 'smallSize',
-  expandedSize: {
-    height: "1200",
-    width: "1500"
-  },
-  smallSize: {
-    height: "800",
-    width: "500"
-  }
-})
+const editorHidden = ref(true);
+const editorSize = ref('smallSize');
 
 const elligbleForSetStart = computed(() => {
   const isPassageSelected = props.editorSelectedPassage !== 0
@@ -100,7 +90,7 @@ function setStartingPassage() {
 
 
 function toggleEditorExpand() {
-  editorState.value.expandedState = editorState.value.expandedState === 'expandedSize' ? 'smallSize' : 'expandedSize';
+  editorSize.value = editorSize.value === 'expandedSize' ? 'smallSize' : 'expandedSize';
 }
 
 function updateEditorContent(editorData) {
@@ -117,7 +107,7 @@ function addNode() {
 }
 
 function deleteNode() {
-  editorState.value.hidden = true;
+  editorHidden.value = true;
   emit('delete-passage');
 }
 
@@ -138,15 +128,15 @@ onNodeDragStart(() => {
 
 onNodeClick((event) => {
   if (props.editorSelectedPassage === Number(event.node.id)) {
-    if (!editorState.value.hidden) {
-      editorState.value.hidden = true
+    if (!editorHidden.value) {
+      editorHidden.value = true
     }
     emit('select-passage', {
       passageId: 0
     });
   } else {
-    if (editorState.value.hidden) {
-      editorState.value.hidden = false
+    if (editorHidden.value) {
+      editorHidden.value = false
     }
     emit('select-passage', {
       passageId: Number(event.node.id)
@@ -204,6 +194,7 @@ async function updateLabel() {
     newLabel: choiceDialogData.value.label
   });
   hideChoiceDialog();
+  choiceDialogData.value.label = "";
 }
 
 function deleteChoice() {
@@ -273,11 +264,10 @@ function deleteChoice() {
     </Panel>
   </VueFlow>
   <v-slide-y-reverse-transition>
-    <MarkdownEditor v-if="!editorState.hidden" :height="editorState[editorState.expandedState].height"
-      :width="editorState[editorState.expandedState].width" @toggle-expand="toggleEditorExpand"
+    <MarkdownEditor v-if="!editorHidden" :editor-size="editorSize" @toggle-expand="toggleEditorExpand"
       :editor-title-content="currentlySelectedPassageData.title"
       :editor-content="currentlySelectedPassageData.description"
-      @toggle-view="editorState.hidden = !editorState.hidden; emit('select-passage', { passageId: 0 })"
+      @toggle-view="editorHidden = !editorHidden; emit('select-passage', { passageId: 0 })"
       @content-updated="updateEditorContent" />
   </v-slide-y-reverse-transition>
 </template>
