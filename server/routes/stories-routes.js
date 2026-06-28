@@ -85,6 +85,12 @@ storiesRouter.patch(
   storyContentController.updateChoice,
 );
 
+storiesRouter.patch(
+  "/stories/:storyId/choice/:choiceId/update-sort",
+  checkAuthenticated,
+  storyContentController.updateChoiceSortOrder,
+);
+
 storiesRouter.delete(
   "/stories/:storyId/choice/:choiceId/delete",
   checkAuthenticated,
