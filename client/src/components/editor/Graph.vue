@@ -41,7 +41,7 @@ const nodes = computed(() =>
     position: { x: passage.pos_x ?? 120, y: passage.pos_y ?? 120 },
     type: "passage",
     label: passage.title,
-    data: { title: passage.title, description: passage.description, isSelected: props.editorSelectedPassage === passage.id },
+    data: { title: passage.title, description: passage.description, isSelected: props.editorSelectedPassage === passage.id, isStart: props.startPassage === passage.id },
     sourcePosition: Position.Bottom,
     targetPosition: Position.Top,
   }))

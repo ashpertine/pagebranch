@@ -1,6 +1,7 @@
 <script setup>
 import { Handle } from '@vue-flow/core'
 import { computed } from "vue";
+import StartIndicator from './StartIndicator.vue';
 
 // props were passed from the slot using `v-bind="customNodeProps"`
 const props = defineProps(['id', 'data', 'label', 'sourcePosition', 'targetPosition'])
@@ -25,7 +26,8 @@ const descriptionPreview = computed(() => {
 )
 </script>
 <template>
-  <div>
+  <div class="custom-passage-node">
+    <StartIndicator class="custom-start-indicator" v-if="data.isStart" />
     <Handle type="source" :position="sourcePosition" />
     <v-card :class="{ 'border-md border-solid border-success': data.isSelected }" :ripple="false">
       <v-card-title :class="{ 'text-disabled': isTitlePlaceholder }">
@@ -43,5 +45,16 @@ const descriptionPreview = computed(() => {
 .vue-flow__handle-bottom {
   width: 28px;
   height: 28px;
+}
+
+.custom-passage-node {
+  position: relative;
+}
+
+.custom-start-indicator {
+  position: absolute;
+  left: -180px;
+  top: 20px;
+  z-index: 1;
 }
 </style>
