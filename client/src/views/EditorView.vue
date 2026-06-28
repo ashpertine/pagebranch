@@ -71,7 +71,7 @@ function setPassageContent(propData) {
 async function getContent() {
   const response = await createGetStoryContentRequest(route.params.storyId);
   const content = await response.json();
-  if (response.responseErr) {
+  if (response.responseErr || content.errorMsg) {
     return router.replace({ name: "ErrorEditor" })
   }
   return content;
@@ -80,7 +80,7 @@ async function getContent() {
 async function initStartPassage() {
   const response = await createGetStartPassageRequest(route.params.storyId);
   const content = await response.json();
-  if (response.responseErr) {
+  if (response.responseErr || content.errorMsg) {
     return router.replace({ name: "ErrorEditor" })
   }
 
@@ -173,9 +173,6 @@ async function saveDeleteChoiceData(propData) {
 onMounted(async () => {
   const content = await getContent()
   const startPassageResult = await initStartPassage();
-  if (content.errorMsg || startPassageResult.errorMsg) {
-    return router.replace({ name: "ErrorEditor" });
-  }
 
   storyContent.value = content;
   startPassage.value = startPassageResult;
