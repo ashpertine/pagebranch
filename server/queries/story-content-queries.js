@@ -213,7 +213,7 @@ async function updateChoiceSortOrderById(
     [choice_id],
   );
 
-  if (!fromPassageIdResults.rowCount > 0) {
+  if (!(fromPassageIdResults.rowCount > 0)) {
     return {
       queryError: "choice not found",
     };
@@ -321,7 +321,7 @@ async function deleteChoiceById(user_id, story_id, choice_id) {
     [choice_id],
   );
 
-  if (!fromPassageIdResults.rowCount > 0) {
+  if (!(fromPassageIdResults.rowCount > 0)) {
     return {
       queryError: "choice not found",
     };
