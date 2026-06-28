@@ -163,7 +163,6 @@ async function createSetStartPassageRequest(story_id, passage_id) {
         "Content-Type": "application/json",
       }),
     });
-
     return response;
   } catch (error) {
     return {
