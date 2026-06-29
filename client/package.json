@@ -15,6 +15,7 @@
     "dompurify": "^3.4.11",
     "marked": "^18.0.5",
     "vue": "^3.5.32",
+    "vue-draggable-plus": "^0.6.1",
     "vue-router": "^5.1.0",
     "vuetify": "^4.1.2"
   },

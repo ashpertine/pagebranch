@@ -132,6 +132,33 @@ async function createUpdateChoiceRequest(
   }
 }
 
+async function createUpdateChoiceSortOrderRequest(
+  story_id,
+  choice_id,
+  sort_order,
+) {
+  try {
+    const response = await fetch(
+      `/api/stories/${story_id}/choice/${choice_id}/update-sort`,
+      {
+        method: "PATCH",
+        body: JSON.stringify({
+          sort_order: sort_order,
+        }),
+        headers: new Headers({
+          "Content-Type": "application/json",
+        }),
+      },
+    );
+
+    return response;
+  } catch (error) {
+    return {
+      responseErr: "Server error. Please try again later" + error.toString(),
+    };
+  }
+}
+
 async function createDeleteChoiceRequest(story_id, choice_id) {
   try {
     const response = await fetch(
@@ -192,6 +219,7 @@ export {
   createDeletePassageRequest,
   createMakeChoiceRequest,
   createUpdateChoiceRequest,
+  createUpdateChoiceSortOrderRequest,
   createDeleteChoiceRequest,
   createSetStartPassageRequest,
   createGetStartPassageRequest,

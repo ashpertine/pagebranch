@@ -10,7 +10,8 @@ import {
   createUpdateChoiceRequest,
   createDeleteChoiceRequest,
   createSetStartPassageRequest,
-  createGetStartPassageRequest
+  createGetStartPassageRequest,
+  createUpdateChoiceSortOrderRequest
 } from "@/api/story-content-api";
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
@@ -156,6 +157,18 @@ async function saveUpdateChoiceData(propData) {
   }
 }
 
+async function saveUpdateChoiceSortOrder(propData) {
+  const { choiceId, currentSort, newSort } = propData;
+  const response = await createUpdateChoiceSortOrderRequest(route.params.storyId, choiceId, newSort);
+  if (response.ok) {
+    const content = await getContent()
+    if (content.errorMsg) {
+      return router.replace({ name: "ErrorEditor" });
+    }
+    storyContent.value = content;
+  }
+}
+
 
 async function saveDeleteChoiceData(propData) {
   const { id } = propData;
@@ -168,6 +181,7 @@ async function saveDeleteChoiceData(propData) {
     storyContent.value = content;
   }
 }
+
 
 
 onMounted(async () => {
@@ -189,7 +203,7 @@ onMounted(async () => {
           @select-passage="setSelectedPassage" @position-modified="setPosition" @update-passage="setPassageContent"
           @delete-passage="saveDeletePassage" @create-new-choice="saveNewChoiceData"
           @update-choice="saveUpdateChoiceData" @delete-choice="saveDeleteChoiceData"
-          @set-start-passage="saveStartPassage" />
+          @set-start-passage="saveStartPassage" @update-choice-sort-order="saveUpdateChoiceSortOrder" />
       </v-container>
     </v-main>
   </v-app>

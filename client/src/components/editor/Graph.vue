@@ -19,7 +19,9 @@ const emit = defineEmits([
   "create-new-choice",
   "update-choice",
   "delete-choice",
-  "set-start-passage"]);
+  "set-start-passage",
+  "update-choice-sort-order"
+]);
 
 class Debounce {
   static timeoutId = null;;
@@ -56,6 +58,11 @@ const edges = computed(() =>
     type: "choice"
   }))
 )
+
+const choicesList = computed(() => {
+  const choicesFromPassage = props.storyContent.choices.filter(choice => choice.from_passage_id === props.editorSelectedPassage).sort((a, b) => a.sort_order - b.sort_order);
+  return choicesFromPassage;
+})
 
 const currentlySelectedPassageData = computed(() => {
   if (props.editorSelectedPassage !== 0) {
@@ -204,6 +211,10 @@ function deleteChoice() {
   hideChoiceDialog();
 }
 
+function updateChoiceSortOrder(propData) {
+  emit('update-choice-sort-order', propData);
+}
+
 </script>
 <template>
   <v-dialog v-model="choiceDialog" width="auto" @after-leave="hideChoiceDialog">
@@ -228,7 +239,9 @@ function deleteChoice() {
   <VueFlow :nodes="nodes" :edges="edges" @connect="onConnect">
     <Background variant="dots" />
     <template #node-passage="props">
-      <PassageNode v-bind="props" />
+      <v-scale-transition>
+        <PassageNode v-bind="props" />
+      </v-scale-transition>
     </template>
     <template #edge-choice="props">
       <ChoiceEdge v-bind="props" />
@@ -266,9 +279,9 @@ function deleteChoice() {
   <v-slide-y-reverse-transition>
     <MarkdownEditor v-if="!editorHidden" :editor-size="editorSize" @toggle-expand="toggleEditorExpand"
       :editor-title-content="currentlySelectedPassageData.title"
-      :editor-content="currentlySelectedPassageData.description"
+      :editor-content="currentlySelectedPassageData.description" :choices-list="choicesList"
       @toggle-view="editorHidden = !editorHidden; emit('select-passage', { passageId: 0 })"
-      @content-updated="updateEditorContent" />
+      @content-updated="updateEditorContent" @update-choice-sort-order="updateChoiceSortOrder" />
   </v-slide-y-reverse-transition>
 </template>
 <style>

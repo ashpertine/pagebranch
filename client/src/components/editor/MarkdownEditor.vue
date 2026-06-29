@@ -1,10 +1,13 @@
 <script setup>
 import { ref, watch, onMounted, computed } from "vue";
-const props = defineProps(['editor-size', 'editor-title-content', 'editor-content']);
-const emit = defineEmits(['toggle-expand', 'content-updated', 'passage-selected', 'toggle-view'])
+const props = defineProps(['editor-size', 'editor-title-content', 'editor-content', 'choices-list']);
+const emit = defineEmits(['toggle-expand', 'content-updated', 'passage-selected', 'toggle-view', 'update-choice-sort-order'])
 import { useDisplay } from "vuetify";
+
+// Supporting libraries
 import { marked } from "marked";
 import DOMPurify from 'dompurify';
+import { VueDraggable } from 'vue-draggable-plus'
 
 const titleEl = ref(null);
 const tab = ref('main');
@@ -61,13 +64,6 @@ function sendContentUpdate() {
   emit('content-updated', { title, description });
 }
 
-// Only update the h1 DOM content FROM THE PROP when the element isn't focused
-// (i.e. when switching to a different passage, not while the user is typing)
-watch(() => props.editorTitleContent, (newVal) => {
-  if (titleEl.value && document.activeElement !== titleEl.value) {
-    titleEl.value.innerText = newVal;
-  }
-});
 
 onMounted(() => {
   if (titleEl.value) {
@@ -84,6 +80,27 @@ const previewHtml = computed(() => {
   }
 })
 
+const choicesDisplayList = ref(props.choicesList.map(choice => ({
+  name: `${choice.sort_order}: ${choice.label}`,
+  id: choice.sort_order,
+  choiceId: choice.id
+}))
+);
+// Only update the h1 DOM content FROM THE PROP when the element isn't focused
+// (i.e. when switching to a different passage, not while the user is typing)
+watch(() => props.editorTitleContent, (newVal) => {
+  if (titleEl.value && document.activeElement !== titleEl.value) {
+    titleEl.value.innerText = newVal;
+  }
+});
+
+watch(() => props.choicesList, (newVal) => {
+  choicesDisplayList.value = newVal.map(choice => ({
+    name: `${choice.sort_order}: ${choice.label}`,
+    id: choice.sort_order,
+    choiceId: choice.id
+  }))
+})
 </script>
 <template>
   <v-sheet class="custom-markdown-editor" border rounded :elevation="4" :class="[editorWidth, editorHeight]">
@@ -126,7 +143,18 @@ const previewHtml = computed(() => {
         </v-container>
       </v-tabs-window-item>
       <v-tabs-window-item value="reorder">
-        <v-sheet class="pa-5" color="brown">Three</v-sheet>
+        <v-list lines="two">
+          <VueDraggable ref="el" v-model="choicesDisplayList" :animation="150"
+            @end="(end) => emit('update-choice-sort-order', { choiceId: end.data.choiceId, currentSort: end.oldIndex, newSort: end.newIndex })">
+            <v-list-item v-for="choiceDisplay in choicesDisplayList" :key="choiceDisplay.id" :value="choiceDisplay.name"
+              :ripple="false">
+              <v-list-item-title v-text="choiceDisplay.name"></v-list-item-title>
+              <template v-slot:append>
+                <v-icon icon="mdi-drag-vertical"></v-icon>
+              </template>
+            </v-list-item>
+          </VueDraggable>
+        </v-list>
       </v-tabs-window-item>
     </v-tabs-window>
   </v-sheet>
