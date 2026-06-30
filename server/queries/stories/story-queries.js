@@ -1,4 +1,4 @@
-import { pbPool } from "../db/pool.js";
+import { pbPool } from "../../db/pool.js";
 
 async function getStoriesByTitle(story_title) {
   const SQL = `SELECT * FROM stories WHERE story_title = $1`;

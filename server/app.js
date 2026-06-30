@@ -4,7 +4,7 @@ import PGSimple from "connect-pg-simple";
 import { pbPool } from "./db/pool.js";
 import passport from "passport";
 import { authRouter } from "./routes/auth-routes.js";
-import { storiesRouter } from "./routes/stories-routes.js";
+import { storyRouter } from "./routes/stories/story-routes.js";
 import cors from "cors";
 
 const pgSession = PGSimple(session);
@@ -40,7 +40,7 @@ app.use(passport.session());
 import "./config/passport.js"; // import passport config
 
 app.use("/api", authRouter);
-app.use("/api", storiesRouter);
+app.use("/api/stories", storyRouter);
 
 // Catch all - 404
 app.use((req, res) => {

@@ -15,6 +15,9 @@ const SQL = `
       author_id INTEGER NOT NULL,
       story_title VARCHAR(255) NOT NULL,
       start_passage_id INTEGER,
+      is_pinned BOOLEAN NOT NULL DEFAULT false,
+      is_private BOOLEAN NOT NULL DEFAULT false, 
+      share_slug VARCHAR(255) NOT NULL,
       updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
       created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
       CONSTRAINT stories_user_fk
@@ -22,6 +25,18 @@ const SQL = `
           REFERENCES users(id)
           ON UPDATE CASCADE
           ON DELETE CASCADE
+  );
+
+  CREATE TABLE IF NOT EXISTS ratings (
+    id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    story_id INTEGER NOT NULL,
+    rating INTEGER NOT NULL,
+    description VARCHAR(1000),
+    CONSTRAINT ratings_story_fk
+      FOREIGN KEY (story_id)
+      REFERENCES stories(id)
+      ON UPDATE CASCADE
+      ON DELETE CASCADE
   );
 
   CREATE TABLE IF NOT EXISTS passages (
@@ -37,6 +52,7 @@ const SQL = `
       ON UPDATE CASCADE
       ON DELETE CASCADE
   );
+
 
   CREATE TABLE IF NOT EXISTS choices (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
