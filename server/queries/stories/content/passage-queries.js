@@ -1,5 +1,6 @@
 import { pbPool } from "../../../db/pool.js";
 import { storyOwnerCheck } from "../../role-queries.js";
+import storyHelperQueries from "../story-helper-queries.js";
 
 async function setStartPassageByStory(user_id, story_id, passage_id) {
   const isOwner = await storyOwnerCheck(user_id, story_id);
@@ -14,6 +15,7 @@ async function setStartPassageByStory(user_id, story_id, passage_id) {
   `;
 
   const { rows } = await pbPool.query(SQL, [passage_id, user_id, story_id]);
+  await storyHelperQueries.updateStoryUpdatedDate(user_id, story_id);
   return rows;
 }
 
@@ -47,6 +49,7 @@ async function insertNewPassage(user_id, story_id, title, description) {
 
   const SQL = `INSERT into passages (story_id, title, description ) VALUES ($1, $2, $3) RETURNING *`;
   const { rows } = await pbPool.query(SQL, [story_id, title, description]);
+  await storyHelperQueries.updateStoryUpdatedDate(user_id, story_id);
   return rows;
 }
 
@@ -81,6 +84,7 @@ async function updatePassageById(
 
   const { rows } = await pbPool.query(SQL, cols);
 
+  await storyHelperQueries.updateStoryUpdatedDate(user_id, story_id);
   return rows;
 }
 
@@ -92,8 +96,6 @@ async function deletePassageById(user_id, story_id, passage_id) {
     "SELECT EXISTS (SELECT 1 FROM stories WHERE author_id = $1 AND start_passage_id = $2) AS is_start_passage",
     [user_id, passage_id],
   );
-
-  console.log(isStartPassageResults);
 
   if (isStartPassageResults.rows[0].is_start_passage) {
     // nullify start passage
@@ -116,6 +118,8 @@ async function deletePassageById(user_id, story_id, passage_id) {
   `;
 
   const { rows } = await pbPool.query(SQL, [user_id, passage_id]);
+
+  await storyHelperQueries.updateStoryUpdatedDate(user_id, story_id);
   return rows;
 }
 

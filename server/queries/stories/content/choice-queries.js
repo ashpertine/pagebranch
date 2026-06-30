@@ -1,5 +1,6 @@
 import { pbPool } from "../../../db/pool.js";
 import { storyOwnerCheck } from "../../role-queries.js";
+import storyHelperQueries from "../story-helper-queries.js";
 
 async function getChoicesByStoryId(user_id, story_id) {
   const isOwner = await storyOwnerCheck(user_id, story_id);
@@ -80,6 +81,8 @@ async function insertNewChoice(
     to_passage_id,
     newSortOrder,
   ]);
+
+  await storyHelperQueries.updateStoryUpdatedDate(user_id, story_id);
   return rows;
 }
 
@@ -144,6 +147,7 @@ async function updateChoiceSortOrderById(
     ]);
   }
 
+  await storyHelperQueries.updateStoryUpdatedDate(user_id, story_id);
   return rows;
 }
 
@@ -193,6 +197,7 @@ async function updateChoiceById(
     choice_id,
   ]);
 
+  await storyHelperQueries.updateStoryUpdatedDate(user_id, story_id);
   return rows;
 }
 
@@ -234,6 +239,8 @@ async function deleteChoiceById(user_id, story_id, choice_id) {
       ]);
     }
   }
+
+  await storyHelperQueries.updateStoryUpdatedDate(user_id, story_id);
   return rows;
 }
 

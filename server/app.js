@@ -5,6 +5,8 @@ import { pbPool } from "./db/pool.js";
 import passport from "passport";
 import { authRouter } from "./routes/auth-routes.js";
 import { storyRouter } from "./routes/stories/story-routes.js";
+import { choiceRouter } from "./routes/stories/content/choice-routes.js";
+import { passageRouter } from "./routes/stories/content/passage-routes.js";
 import cors from "cors";
 
 const pgSession = PGSimple(session);
@@ -41,6 +43,8 @@ import "./config/passport.js"; // import passport config
 
 app.use("/api", authRouter);
 app.use("/api/stories", storyRouter);
+app.use("/api/stories", passageRouter);
+app.use("/api/stories", choiceRouter);
 
 // Catch all - 404
 app.use((req, res) => {

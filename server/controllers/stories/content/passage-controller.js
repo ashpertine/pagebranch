@@ -180,7 +180,6 @@ async function deletePassage(req, res) {
 export default {
   updateStartPassage,
   getStartPassage,
-  getStoryContent,
   postNewPassage,
   updatePassages,
   deletePassage,

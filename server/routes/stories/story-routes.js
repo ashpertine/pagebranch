@@ -1,12 +1,18 @@
 import storyController from "../../controllers/stories/story-controller.js";
 import { checkAuthenticated } from "../../middleware/auth-helper.js";
 import { Router } from "express";
+import { newStoryValidation } from "../../middleware/validation-helper.js";
 
 const storyRouter = Router();
 
 storyRouter.get("/", checkAuthenticated, storyController.getUserStories);
 
-storyRouter.post("/new", checkAuthenticated, storyController.postNewStory);
+storyRouter.post(
+  "/new",
+  checkAuthenticated,
+  newStoryValidation,
+  storyController.postNewStory,
+);
 
 storyRouter.patch(
   "/:storyId/update",

@@ -1,27 +1,31 @@
 import choiceController from "../../../controllers/stories/content/choice-controller.js";
 import { checkAuthenticated } from "../../../middleware/auth-helper.js";
-import { storyRouter } from "../story-routes.js";
+import { Router } from "express";
 
-storyRouter.post(
+const choiceRouter = Router();
+
+choiceRouter.post(
   "/:storyId/choice/new",
   checkAuthenticated,
   choiceController.postNewChoice,
 );
 
-storyRouter.patch(
+choiceRouter.patch(
   "/:storyId/choice/:choiceId/update",
   checkAuthenticated,
   choiceController.updateChoice,
 );
 
-storyRouter.patch(
+choiceRouter.patch(
   "/:storyId/choice/:choiceId/update-sort",
   checkAuthenticated,
   choiceController.updateChoiceSortOrder,
 );
 
-storyRouter.delete(
+choiceRouter.delete(
   "/:storyId/choice/:choiceId/delete",
   checkAuthenticated,
   choiceController.deleteChoice,
 );
+
+export { choiceRouter };

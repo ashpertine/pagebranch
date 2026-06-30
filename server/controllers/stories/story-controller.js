@@ -1,6 +1,7 @@
 import passageQueries from "../../queries/stories/content/passage-queries.js";
 import choiceQueries from "../../queries/stories/content/choice-queries.js";
 import storyQueries from "../../queries/stories/story-queries.js";
+import { validationResult, matchedData } from "express-validator";
 
 async function getStoryContent(req, res) {
   try {
@@ -48,15 +49,19 @@ async function getUserStories(req, res) {
 
 async function postNewStory(req, res) {
   try {
-    const userId = req.session.passport.user;
-    const storyTitle = req.body.story_title;
-    if (!userId || !storyTitle) {
+    const result = validationResult(req);
+    if (!result.isEmpty()) {
+      //handle errors
+      const errors = result.mapped();
       return res.status(400).json({
-        errorMsg: "story title is undefined!",
+        errorMsg: errors.story_title.msg,
       });
     }
+    const userId = req.session.passport.user;
 
-    const results = await storyQueries.createNewStory(userId, storyTitle);
+    const { story_title } = matchedData(req);
+
+    const results = await storyQueries.createNewStory(userId, story_title);
     res.status(200).json(results);
   } catch (error) {
     console.error(error);

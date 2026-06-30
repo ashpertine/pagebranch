@@ -1,4 +1,5 @@
 import { pbPool } from "../../db/pool.js";
+import storyHelperQueries from "./story-helper-queries.js";
 
 async function getStoriesByTitle(story_title) {
   const SQL = `SELECT * FROM stories WHERE story_title = $1`;
@@ -21,11 +22,13 @@ async function createNewStory(user_id, story_title) {
     story_title = `Copy of ${story_title}`;
   }
 
+  const shareSlug = story_title.toLowerCase().split(" ").join("-");
+
   const SQL = `
-    INSERT INTO stories (author_id, story_title) VALUES ($1, $2) RETURNING *
+    INSERT INTO stories (author_id, story_title, share_slug) VALUES ($1, $2, $3) RETURNING *
   `;
 
-  const { rows } = await pbPool.query(SQL, [user_id, story_title]);
+  const { rows } = await pbPool.query(SQL, [user_id, story_title, shareSlug]);
   return rows;
 }
 
@@ -38,6 +41,7 @@ async function deleteStoryById(user_id, story_id) {
 async function updateStoryById(user_id, story_id, story_title) {
   const SQL = `UPDATE stories SET story_title = $1 WHERE id = $2 AND author_id = $3 RETURNING *`;
   const { rows } = await pbPool.query(SQL, [story_title, story_id, user_id]);
+  await storyHelperQueries.updateStoryUpdatedDate(user_id, story_id);
   return rows;
 }
 
