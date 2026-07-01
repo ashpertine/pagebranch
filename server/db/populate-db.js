@@ -39,6 +39,17 @@ const SQL = `
       ON DELETE CASCADE
   );
 
+  CREATE TABLE IF NOT EXISTS settings (
+    id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    user_id INTEGER NOT NULL,
+    preferences JSONB NOT NULL DEFAULT '{}'::jsonb,
+    CONSTRAINT settings_user_fk
+      FOREIGN KEY (user_id)
+      REFERENCES users(id)
+      ON UPDATE CASCADE
+      ON DELETE CASCADE
+  );
+
   CREATE TABLE IF NOT EXISTS passages (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     story_id INTEGER NOT NULL,

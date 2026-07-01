@@ -40,9 +40,9 @@ onMounted(async () => {
 </script>
 <template>
   <v-app>
-    <AppBar @stories-updated="getStories" />
-    <v-main>
-      <v-container fluid v-if="pinnedStories.length > 0">
+    <AppBar @stories-updated="getStories" bar-title="Pagebranch" />
+    <v-main v-if="stories.length > 0">
+      <v-container v-if="pinnedStories.length > 0">
         <div class="text-title-large mb-4 text-medium-emphasis font-weight-semibold">Pinned Stories</div>
         <v-row density="comfortable">
           <v-col v-for="story in pinnedStories" xl="3" lg="4" md="6" cols="12" :key="story.id">
@@ -52,13 +52,19 @@ onMounted(async () => {
         </v-row>
       </v-container>
       <v-divider></v-divider>
-      <v-container fluid>
+      <v-container>
         <v-row density="comfortable">
           <v-col v-for="story in nonPinnedStories" xl="3" lg="4" md="6" cols="12" :key="story.id">
             <StoryCard :title="story.story_title" :story-id="story.id" :created-at=story.created_at
               :is-pinned="story.is_pinned" :updated-at=story.updated_at @stories-updated="getStories" />
           </v-col>
         </v-row>
+      </v-container>
+    </v-main>
+    <v-main v-else>
+      <v-container class="d-flex flex-column justify-center align-center h-100 ga-6">
+        <div class="text-display-medium text-medium-emphasis">No stories yet. Make one by clicking the button at the
+          top.</div>
       </v-container>
     </v-main>
   </v-app>

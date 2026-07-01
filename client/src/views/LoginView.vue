@@ -1,6 +1,6 @@
 <script setup>
-  import FlashMessage from '../components/FlashMessage.vue';
-  import LoginBox from '../components/auth/LoginBox.vue';
+import FlashMessage from '../components/FlashMessage.vue';
+import LoginBox from '../components/auth/LoginBox.vue';
 </script>
 <template>
   <v-app>
@@ -10,5 +10,4 @@
   </v-app>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

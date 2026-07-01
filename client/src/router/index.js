@@ -5,6 +5,7 @@ import HomepageView from "../views/HomepageView.vue";
 import EditorView from "../views/EditorView.vue";
 import { getAuthStatus } from "./router-helpers.js";
 import ErrorView from "@/views/ErrorView.vue";
+import SettingsView from "@/views/SettingsView.vue";
 
 const routes = [
   {
@@ -21,6 +22,11 @@ const routes = [
     name: "Homepage",
     path: "/home",
     component: HomepageView,
+  },
+  {
+    name: "Settings",
+    path: "/settings",
+    component: SettingsView,
   },
   {
     name: "Editor",
