@@ -39,12 +39,12 @@ const titleRules = [
 </script>
 <template>
   <v-dialog max-width="500">
-    <v-card>
+    <v-card class="px-4 py-4">
       <v-card-title>Edit Name</v-card-title>
       <v-card-subtitle>Enter a new name.</v-card-subtitle>
       <div class="text-title-medium text-red-lighten-2 pb-4 px-5 rounded-md" v-if="errorMsg.length !== 0"> {{ errorMsg
-      }}</div>
-      <v-form class="px-4 py-4" @submit.prevent="updateStory(storyTitle, storyId)" ref="form">
+        }}</div>
+      <v-form class="px-4 pt-4" @submit.prevent="updateStory(storyTitle, storyId)" ref="form">
         <v-text-field label="Title" v-model="storyTitle" :rules="titleRules"></v-text-field>
         <v-card-actions>
           <v-spacer></v-spacer>

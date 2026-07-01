@@ -32,4 +32,10 @@ storyRouter.get(
   storyController.getStoryContent,
 );
 
+storyRouter.patch(
+  "/:storyId/pin",
+  checkAuthenticated,
+  storyController.updateStoryPin,
+);
+
 export { storyRouter };

@@ -128,10 +128,34 @@ async function deleteStory(req, res) {
   }
 }
 
+async function updateStoryPin(req, res) {
+  try {
+    const userId = req.session.passport.user;
+    const storyId = req.params.storyId;
+    if (!storyId) {
+      return res.status(400).json({
+        errorMsg: "story id is undefined!",
+      });
+    }
+
+    const results = await storyQueries.updateStoryPinById(userId, storyId);
+    if (results.length === 0) {
+      return res.status(404).json({ errorMsg: "Story not found" });
+    }
+    return res.status(200).json(results);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      errorMsg: error.toString(),
+    });
+  }
+}
+
 export default {
   getStoryContent,
   getUserStories,
   postNewStory,
   updateStory,
   deleteStory,
+  updateStoryPin,
 };

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 
 // Components 
 import StoryCard from "../components/stories/StoryCard.vue";
@@ -25,6 +25,13 @@ async function getStories() {
   }
 }
 
+const pinnedStories = computed(() => {
+  return stories.value.filter((story) => story.is_pinned);
+})
+
+const nonPinnedStories = computed(() => {
+  return stories.value.filter((story) => !story.is_pinned);
+})
 
 onMounted(async () => {
   await getStories();
@@ -35,11 +42,21 @@ onMounted(async () => {
   <v-app>
     <AppBar @stories-updated="getStories" />
     <v-main>
+      <v-container fluid v-if="pinnedStories.length > 0">
+        <div class="text-title-large mb-4 text-medium-emphasis font-weight-semibold">Pinned Stories</div>
+        <v-row density="comfortable">
+          <v-col v-for="story in pinnedStories" xl="3" lg="4" md="6" cols="12" :key="story.id">
+            <StoryCard :title="story.story_title" :story-id="story.id" :created-at=story.created_at
+              :is-pinned="story.is_pinned" :updated-at=story.updated_at @stories-updated="getStories" />
+          </v-col>
+        </v-row>
+      </v-container>
+      <v-divider></v-divider>
       <v-container fluid>
         <v-row density="comfortable">
-          <v-col v-for="story in stories" xl="3" lg="4" md="6" cols="12" :key="story.id">
+          <v-col v-for="story in nonPinnedStories" xl="3" lg="4" md="6" cols="12" :key="story.id">
             <StoryCard :title="story.story_title" :story-id="story.id" :created-at=story.created_at
-              :updated-at=story.updated_at @stories-updated="getStories" />
+              :is-pinned="story.is_pinned" :updated-at=story.updated_at @stories-updated="getStories" />
           </v-col>
         </v-row>
       </v-container>

@@ -9,7 +9,7 @@ const drawer = ref(false)
 <template>
   <v-app-bar>
     <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-    <v-app-bar-title>Pagebranch</v-app-bar-title>
+    <v-app-bar-title class="">Pagebranch</v-app-bar-title>
 
     <template v-slot:append>
       <v-container class="d-flex ga-2">

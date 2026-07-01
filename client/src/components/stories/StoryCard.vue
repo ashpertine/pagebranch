@@ -3,11 +3,12 @@ import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import StoryDeleteDialog from './StoryDeleteDialog.vue';
 import StoryUpdateDialog from './StoryUpdateDialog.vue';
-const props = defineProps(['title', 'storyId', 'createdAt', 'updatedAt']);
+const props = defineProps(['title', 'storyId', 'createdAt', 'updatedAt', 'isPinned']);
 const emit = defineEmits(['stories-updated']);
 const router = useRouter();
 const deleteDialog = ref(false);
 const updateDialog = ref(false);
+import { createUpdatePinRequest } from "../../api/stories-api";
 
 const titleTruncated = computed(() => {
   if (props.title.length > 22) {
@@ -46,21 +47,42 @@ const createdAtFormatted = computed(() => {
     day: "numeric",
   });
 })
+
+async function savePinUpdate() {
+  const response = await createUpdatePinRequest(props.storyId);
+  if (response.responseErr) {
+    return router.replace({ name: "Error" })
+  }
+  emit('stories-updated');
+}
 </script>
 <template>
   <v-card>
     <v-card-title class="d-flex justify-space-between align-center">
-      <v-tooltip v-if="title !== titleTruncated" :text="title">
-        <template v-slot:activator="{ props }">
-          <span class="text-headline-small" v-bind="props"> {{ titleTruncated }} </span>
-        </template>
-      </v-tooltip>
-      <span v-else class="text-headline-small" v-bind="props"> {{ titleTruncated }} </span>
+      <div>
+        <v-tooltip v-if="title !== titleTruncated" :text="title">
+          <template v-slot:activator="{ props }">
+            <span class="text-headline-small" v-bind="props"> {{ titleTruncated }} </span>
+          </template>
+        </v-tooltip>
+        <span v-else class="text-headline-small" v-bind="props"> {{ titleTruncated }} </span>
+        <v-icon icon="mdi-pin" v-if="isPinned" color="grey-darken-1" size="x-small"></v-icon>
+      </div>
       <v-menu>
         <template v-slot:activator="{ props }">
           <v-icon-btn icon="mdi-dots-vertical" v-bind="props"></v-icon-btn>
         </template>
         <v-list>
+          <v-list-item value="pin" prepend-icon="mdi-pin-off" @click="savePinUpdate" v-if="isPinned">
+            <v-list-item-title>
+              Unpin
+            </v-list-item-title>
+          </v-list-item>
+          <v-list-item value="pin" prepend-icon="mdi-pin" @click="savePinUpdate" v-else>
+            <v-list-item-title>
+              Pin
+            </v-list-item-title>
+          </v-list-item>
           <v-list-item value="update" @click="updateDialog = true">
             <v-list-item-title>
               Edit Name

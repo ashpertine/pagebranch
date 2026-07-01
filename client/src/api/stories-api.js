@@ -62,9 +62,24 @@ async function createGetStoriesRequest() {
   }
 }
 
+async function createUpdatePinRequest(story_id) {
+  try {
+    const response = await fetch(`/api/stories/${story_id}/pin`, {
+      method: "PATCH",
+    });
+
+    return response;
+  } catch (error) {
+    return {
+      responseErr: "Server error. Please try again later" + error.toString(),
+    };
+  }
+}
+
 export {
   createDeleteStoryRequest,
   createUpdateStoryRequest,
   createMakeStoryRequest,
   createGetStoriesRequest,
+  createUpdatePinRequest,
 };

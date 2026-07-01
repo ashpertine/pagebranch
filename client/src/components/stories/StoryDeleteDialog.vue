@@ -24,11 +24,11 @@ async function deleteStory(story_id) {
 </script>
 <template>
   <v-dialog max-width="500">
-    <v-card>
+    <v-card class="px-4 py-4">
       <v-card-title>Delete Story</v-card-title>
       <v-card-subtitle>Are you sure you want to delete this story?</v-card-subtitle>
       <div class="text-title-medium text-red-lighten-2 pb-4 px-5 rounded-md" v-if="errorMsg.length !== 0"> {{ errorMsg
-        }}</div>
+      }}</div>
       <v-form class="px-5" @submit.prevent="deleteStory(storyId)">
         <v-card-actions>
           <v-spacer></v-spacer>
