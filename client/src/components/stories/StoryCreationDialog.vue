@@ -37,11 +37,11 @@ const titleRules = [
 ]
 </script>
 <template>
-  <v-icon-btn @click="dialog = true" color="primary" icon="mdi-plus" variant="flat"></v-icon-btn>
+  <v-btn @click="dialog = true" color="primary" prepend-icon="mdi-plus" variant="flat" size="large">New</v-btn>
   <v-dialog max-width="500" v-model="dialog">
-    <v-card title="Add new story">
+    <v-card title="Add new story" class="px-4 py-4">
       <div class="text-title-medium text-red-lighten-2 pb-4 px-5 rounded-md" v-if="errorMsg.length !== 0"> {{ errorMsg
-      }}</div>
+        }}</div>
       <v-form class="px-5" @submit.prevent="makeStory(storyTitle)" ref="form">
         <v-text-field label="Title" v-model="storyTitle" :rules="titleRules"></v-text-field>
         <v-card-actions>

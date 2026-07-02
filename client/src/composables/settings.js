@@ -6,6 +6,7 @@ import {
 import { useRouter } from "vue-router";
 
 const localSettings = ref({});
+const defaultNodePosition = 150;
 function useSettings() {
   const router = useRouter();
 
@@ -27,7 +28,12 @@ function useSettings() {
     localSettings.value = content.results.preferences;
   }
 
-  return { saveUpdateSettings, initSettings, localSettings };
+  return {
+    saveUpdateSettings,
+    initSettings,
+    localSettings,
+    defaultNodePosition,
+  };
 }
 
 export { useSettings };

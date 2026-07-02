@@ -12,13 +12,21 @@ async function createGetStoryContentRequest(story_id) {
   }
 }
 
-async function createMakePassageRequest(story_id, title, description) {
+async function createMakePassageRequest(
+  story_id,
+  title,
+  description,
+  pos_x,
+  pos_y,
+) {
   try {
     const response = await fetch(`/api/stories/${story_id}/passage/new`, {
       method: "POST",
       body: JSON.stringify({
         title,
         description,
+        pos_x,
+        pos_y,
       }),
       headers: new Headers({
         "Content-Type": "application/json",

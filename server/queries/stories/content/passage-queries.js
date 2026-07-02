@@ -43,12 +43,26 @@ async function getPassagesByStoryId(user_id, story_id) {
   return rows;
 }
 
-async function insertNewPassage(user_id, story_id, title, description) {
+async function insertNewPassage(
+  user_id,
+  story_id,
+  title,
+  description,
+  pos_x,
+  pos_y,
+) {
   const isOwner = await storyOwnerCheck(user_id, story_id);
   if (!isOwner) return null;
 
-  const SQL = `INSERT into passages (story_id, title, description ) VALUES ($1, $2, $3) RETURNING *`;
-  const { rows } = await pbPool.query(SQL, [story_id, title, description]);
+  const SQL = `INSERT into passages (story_id, title, description, pos_x, pos_y ) VALUES ($1, $2, $3, $4, $5) RETURNING *`;
+  const { rows } = await pbPool.query(SQL, [
+    story_id,
+    title,
+    description,
+    pos_x,
+    pos_y,
+  ]);
+
   await storyHelperQueries.updateStoryUpdatedDate(user_id, story_id);
   return rows;
 }

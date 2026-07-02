@@ -1,11 +1,13 @@
 <script setup>
-import { h, ref, markRaw, computed, onMounted } from 'vue';
+import { h, ref, computed } from 'vue';
 import PassageNode from "./PassageNode.vue";
 import ChoiceEdgeLabel from './ChoiceEdgeLabel.vue';
 import ChoiceEdge from './ChoiceEdge.vue'
 import MarkdownEditor from "./MarkdownEditor.vue";
 import { Background } from '@vue-flow/background'
 import { useVueFlow, VueFlow, Panel, Position } from '@vue-flow/core';
+import { useSettings } from "../../composables/settings.js";
+import { Debounce } from '../../composables/debounce.js';
 
 const { onNodeClick, onNodeDragStop, onNodeDragStart, onEdgeDoubleClick } = useVueFlow();
 const props = defineProps(["story-content", "editor-selected-passage", "start-passage"]);
@@ -23,24 +25,15 @@ const emit = defineEmits([
   "update-choice-sort-order"
 ]);
 
-class Debounce {
-  static timeoutId = null;;
+const { localSettings, defaultNodePosition } = useSettings();
 
-  static saveDebounce(debounce_time) {
-    this.timeoutId = setTimeout(() => {
-      emit('save-content');
-    }, debounce_time);
-  }
-
-  static cancelDebounce() {
-    clearTimeout(this.timeoutId);
-  }
-}
+const defaultPosX = localSettings.value.default_pos_x ?? defaultNodePosition;
+const defaultPosY = localSettings.value.default_pos_y ?? defaultNodePosition;
 
 const nodes = computed(() =>
   props.storyContent.passages.map(passage => ({
     id: `${passage.id}`,
-    position: { x: passage.pos_x ?? 120, y: passage.pos_y ?? 120 },
+    position: { x: passage.pos_x ?? defaultPosX, y: passage.pos_y ?? defaultPosY },
     type: "passage",
     label: passage.title,
     data: { title: passage.title, description: passage.description, isSelected: props.editorSelectedPassage === passage.id, isStart: props.startPassage === passage.id },
@@ -106,7 +99,7 @@ function updateEditorContent(editorData) {
     title: editorData.title,
     description: editorData.description
   })
-  Debounce.saveDebounce(1000);
+  Debounce.saveDebounce(1000, () => emit('save-content'));
 }
 
 function addNode() {
@@ -125,7 +118,7 @@ onNodeDragStop((event) => {
     pos_x: event.node.position.x,
     pos_y: event.node.position.y
   });
-  Debounce.saveDebounce(200);
+  Debounce.saveDebounce(200, () => emit('save-content'));
 })
 
 onNodeDragStart(() => {

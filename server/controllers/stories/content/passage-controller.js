@@ -74,15 +74,23 @@ async function postNewPassage(req, res) {
   try {
     const userId = req.session.passport.user;
     const storyId = req.params.storyId;
-    let { title, description } = req.body;
+    let { title, description, pos_x, pos_y } = req.body;
     title = title ?? null;
     description = description ?? null;
+
+    if (!pos_x || !pos_y) {
+      return res.status(400).json({
+        errorMsg: "pos_x and pos_y is undefined!",
+      });
+    }
 
     const results = await passageQueries.insertNewPassage(
       userId,
       storyId,
       title,
       description,
+      pos_x,
+      pos_y,
     );
 
     if (results === null) {

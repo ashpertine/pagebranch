@@ -31,7 +31,7 @@ const descriptionPreview = computed(() => {
     <Handle type="source" :position="sourcePosition" />
     <v-card :class="{ 'border-md border-solid border-success': data.isSelected }" :ripple="false">
       <v-card-title :class="{ 'text-disabled': isTitlePlaceholder }">
-        {{ id }}: {{ titlePreview }}
+        {{ titlePreview }}
       </v-card-title>
 
       <v-card-text :class="{ 'text-disabled': isDescriptionPlaceholder }">

@@ -16,7 +16,9 @@ import {
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { Position } from "@vue-flow/core";
+import { useSettings } from "../composables/settings";
 
+const { localSettings } = useSettings();
 const newNodeData = {
   position: { x: 120, y: 120 },
   type: "passage",
@@ -101,7 +103,7 @@ async function saveStartPassage() {
 
 
 async function saveNewPassageData() {
-  const response = await createMakePassageRequest(route.params.storyId, newNodeData.data.title, newNodeData.data.description);
+  const response = await createMakePassageRequest(route.params.storyId, newNodeData.data.title, newNodeData.data.description, localSettings.value.default_pos_x ?? 150, localSettings.value.default_pos_y ?? 150);
   if (response.ok) {
     const content = await getContent()
     if (content.errorMsg) {
