@@ -4,10 +4,8 @@ import settingsController from "../controllers/settings-controller.js";
 
 const settingsRouter = Router();
 
-settingsRouter.patch(
-  "/:userId",
-  checkAuthenticated,
-  settingsController.updateSettings,
-);
+settingsRouter.patch("/", settingsController.updateSettings);
+
+settingsRouter.get("/", settingsController.getSettings);
 
 export { settingsRouter };

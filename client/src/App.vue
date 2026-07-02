@@ -1,4 +1,18 @@
-<script setup></script>
+<script setup>
+import { onMounted } from "vue";
+import { useSettings } from "./composables/settings.js";
+
+import { useTheme } from "vuetify";
+const { initSettings, localSettings } = useSettings();
+
+const theme = useTheme();
+
+onMounted(async () => {
+  await initSettings();
+  const userTheme = localSettings.value.theme ?? "dark";
+  theme.change(userTheme);
+})
+</script>
 
 <template>
   <RouterView v-slot="{ Component }">

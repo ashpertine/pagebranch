@@ -3,9 +3,14 @@ import { genPassword } from "../utils/password-utils.js";
 
 async function insertNewUser(username, password) {
   const hashed = await genPassword(password);
-  const SQL = "INSERT INTO users (username, password) VALUES ($1, $2)";
+  const SQL =
+    "INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id";
 
-  await pbPool.query(SQL, [username, hashed]);
+  const { rows } = await pbPool.query(SQL, [username, hashed]);
+  const userId = rows[0].id;
+
+  await pbPool.query("INSERT INTO settings (user_id) VALUES ($1)", [userId]);
+  return rows;
 }
 
 async function getUserByUsername(username) {

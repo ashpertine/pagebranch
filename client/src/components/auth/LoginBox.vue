@@ -1,7 +1,15 @@
 <script setup>
 import { LoginForm } from '../../composables/login-form.js';
 import FlashMessage from '../../components/FlashMessage.vue';
-const { form, formMapping, globalErrorMsg, validateField, submitLogin } = LoginForm()
+const { form, formMapping, globalErrorMsg, submitLogin } = LoginForm()
+import { useTheme } from 'vuetify';
+import { useSettings } from '../../composables/settings.js';
+import { useRouter } from "vue-router";
+
+
+const theme = useTheme();
+const { initSettings, localSettings } = useSettings();
+const router = useRouter();
 
 const usernameRules = [
   value => {
@@ -34,7 +42,13 @@ async function verifyAndSubmit() {
     return;
   }
 
-  await submitLogin();
+  const response = await submitLogin();
+  if (response.ok) {
+    await initSettings();
+    const userTheme = localSettings.value.theme ?? "dark";
+    theme.change(userTheme);
+    router.replace({ path: "/home" });
+  }
 }
 </script>
 <template>

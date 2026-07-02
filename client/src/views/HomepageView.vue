@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
+import { useSettings } from "../composables/settings.js"
 
 // Components 
 import StoryCard from "../components/stories/StoryCard.vue";

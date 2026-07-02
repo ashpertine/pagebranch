@@ -2,6 +2,8 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { capitalizeFirstLetter } from "./helpers.js";
 import { createLoginRequest } from "../api/auth-api.js";
+import { useSettings } from "./settings.js";
+import { useTheme } from "vuetify";
 
 export function LoginForm() {
   const router = useRouter();
@@ -19,10 +21,10 @@ export function LoginForm() {
           globalErrorMsg.value = `Login request rejected. Correct your values and try again.`;
         }
       } else {
-        router.replace({ path: "/home" });
+        return response;
       }
     } catch (error) {
-      globalErrorMsg.value = `HTTP error ${response.status}: ${responseErrorMsg}`;
+      globalErrorMsg.value = `${error}`;
     }
   }
 
