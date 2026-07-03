@@ -11,8 +11,6 @@ async function getReadStoryContent(req, res) {
       await storyQueries.getStoryByUserAndSlug(viewUserId, shareSlug)
     )[0];
 
-    console.log(story);
-
     if (!story) {
       return res.status(404).json({
         errorMsg: "Story not found",
