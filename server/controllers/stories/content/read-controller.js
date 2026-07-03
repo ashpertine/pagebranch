@@ -9,7 +9,9 @@ async function getReadStoryContent(req, res) {
 
     const story = (
       await storyQueries.getStoryByUserAndSlug(viewUserId, shareSlug)
-    ).rows[0];
+    )[0];
+
+    console.log(story);
 
     if (!story) {
       return res.status(404).json({
@@ -27,11 +29,11 @@ async function getReadStoryContent(req, res) {
     const storyId = story.id;
 
     const passagesResults = await passageQueries.getPassagesByStoryId(
-      userId,
+      viewUserId,
       storyId,
     );
     const choicesResults = await choiceQueries.getChoicesByStoryId(
-      userId,
+      viewUserId,
       storyId,
     );
 

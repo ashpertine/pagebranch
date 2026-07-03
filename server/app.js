@@ -48,7 +48,7 @@ app.use("/api/stories", storyRouter);
 app.use("/api/stories", passageRouter);
 app.use("/api/stories", choiceRouter);
 app.use("/api/settings", settingsRouter);
-app.use("/api/read/", readRouter);
+app.use("/api/read", readRouter);
 
 // Catch all - 404
 app.use((req, res) => {

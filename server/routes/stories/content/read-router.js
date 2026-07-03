@@ -4,5 +4,5 @@ import { Router } from "express";
 
 const readRouter = Router();
 
-readRouter.patch("/:userId/:shareSlug", readController.getReadStoryContent);
+readRouter.get("/:userId/:shareSlug", readController.getReadStoryContent);
 export { readRouter };

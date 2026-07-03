@@ -75,7 +75,7 @@ async function getContent() {
   const response = await createGetStoryContentRequest(route.params.storyId);
   const content = await response.json();
   if (response.responseErr || content.errorMsg) {
-    return router.replace({ name: "ErrorEditor" })
+    return router.replace({ name: "Error" })
   }
   return content;
 }
@@ -84,7 +84,7 @@ async function initStartPassage() {
   const response = await createGetStartPassageRequest(route.params.storyId);
   const content = await response.json();
   if (response.responseErr || content.errorMsg) {
-    return router.replace({ name: "ErrorEditor" })
+    return router.replace({ name: "Error" })
   }
 
   return content.results.start_passage_id;
@@ -95,7 +95,7 @@ async function saveStartPassage() {
   const response = await createSetStartPassageRequest(route.params.storyId, editorSelectedPassage.value);
   const content = await response.json();
   if (response.responseErr) {
-    return router.replace({ name: "ErrorEditor" })
+    return router.replace({ name: "Error" })
   }
 
   startPassage.value = content.results.start_passage_id;
@@ -107,7 +107,7 @@ async function saveNewPassageData() {
   if (response.ok) {
     const content = await getContent()
     if (content.errorMsg) {
-      return router.replace({ name: "ErrorEditor" });
+      return router.replace({ name: "Error" });
     }
     storyContent.value = content;
   }
@@ -124,7 +124,7 @@ async function saveDeletePassage() {
   if (response.ok) {
     const content = await getContent()
     if (content.errorMsg) {
-      return router.replace({ name: "ErrorEditor" });
+      return router.replace({ name: "Error" });
     }
     storyContent.value = content;
   }
@@ -137,7 +137,7 @@ async function saveNewChoiceData(propData) {
   if (response.ok) {
     const content = await getContent()
     if (content.errorMsg) {
-      return router.replace({ name: "ErrorEditor" });
+      return router.replace({ name: "Error" });
     }
     storyContent.value = content;
   }
@@ -153,7 +153,7 @@ async function saveUpdateChoiceData(propData) {
   if (response.ok) {
     const content = await getContent()
     if (content.errorMsg) {
-      return router.replace({ name: "ErrorEditor" });
+      return router.replace({ name: "Error" });
     }
     storyContent.value = content;
   }
@@ -165,7 +165,7 @@ async function saveUpdateChoiceSortOrder(propData) {
   if (response.ok) {
     const content = await getContent()
     if (content.errorMsg) {
-      return router.replace({ name: "ErrorEditor" });
+      return router.replace({ name: "Error" });
     }
     storyContent.value = content;
   }
@@ -178,7 +178,7 @@ async function saveDeleteChoiceData(propData) {
   if (response.ok) {
     const content = await getContent()
     if (content.errorMsg) {
-      return router.replace({ name: "ErrorEditor" });
+      return router.replace({ name: "Error" });
     }
     storyContent.value = content;
   }

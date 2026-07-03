@@ -40,13 +40,13 @@ const routes = [
     component: EditorView,
   },
   {
-    name: "ErrorEditor",
-    path: "/edit/notfound",
+    name: "Error",
+    path: "/error",
     component: ErrorView,
   },
   {
-    name: "Error",
-    path: "/:pathMatch(.*)*",
+    name: "FallbackError",
+    path: "/:pathName(.*)*",
     component: ErrorView,
   },
 ];

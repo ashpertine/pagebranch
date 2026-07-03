@@ -12,6 +12,20 @@ async function createGetStoryContentRequest(story_id) {
   }
 }
 
+async function createGetReadContentRequest(user_id, share_slug) {
+  try {
+    const response = await fetch(`/api/read/${user_id}/${share_slug}`, {
+      method: "GET",
+    });
+
+    return response;
+  } catch (error) {
+    return {
+      responseErr: "Server error. Please try again later" + error.toString(),
+    };
+  }
+}
+
 async function createMakePassageRequest(
   story_id,
   title,
@@ -222,6 +236,7 @@ async function createGetStartPassageRequest(story_id) {
 
 export {
   createGetStoryContentRequest,
+  createGetReadContentRequest,
   createMakePassageRequest,
   createUpdatePassagesRequest,
   createDeletePassageRequest,

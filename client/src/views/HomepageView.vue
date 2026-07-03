@@ -36,7 +36,6 @@ const nonPinnedStories = computed(() => {
 
 onMounted(async () => {
   await getStories();
-  console.log(stories.value);
 })
 
 </script>

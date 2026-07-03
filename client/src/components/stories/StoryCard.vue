@@ -29,8 +29,6 @@ async function goToEditor() {
 }
 
 async function viewStory() {
-  console.log(props.authorId);
-  console.log(props.shareSlug);
   router.push({
     name: "ReadingPage",
     params: {

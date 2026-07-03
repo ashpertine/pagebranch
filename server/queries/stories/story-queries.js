@@ -26,7 +26,7 @@ async function getStoriesByTitle(story_title, user_id) {
 }
 
 async function getStoryByUserAndSlug(user_id, share_slug) {
-  const SQL = `SELECT * FROM stories WHERE id = $1 AND share_slug $2`;
+  const SQL = `SELECT * FROM stories WHERE id = $1 AND share_slug = $2`;
   const { rows } = await pbPool.query(SQL, [user_id, share_slug]);
   return rows;
 }
