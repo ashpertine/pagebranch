@@ -76,10 +76,25 @@ async function createUpdatePinRequest(story_id) {
   }
 }
 
+async function createTogglePrivacyRequest(story_id) {
+  try {
+    const response = await fetch(`/api/stories/${story_id}/privacy`, {
+      method: "PATCH",
+    });
+
+    return response;
+  } catch (error) {
+    return {
+      responseErr: "Server error. Please try again later" + error.toString(),
+    };
+  }
+}
+
 export {
   createDeleteStoryRequest,
   createUpdateStoryRequest,
   createMakeStoryRequest,
   createGetStoriesRequest,
   createUpdatePinRequest,
+  createTogglePrivacyRequest,
 };

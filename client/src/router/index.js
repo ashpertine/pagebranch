@@ -6,6 +6,7 @@ import EditorView from "../views/EditorView.vue";
 import { getAuthStatus } from "./router-helpers.js";
 import ErrorView from "@/views/ErrorView.vue";
 import SettingsView from "@/views/SettingsView.vue";
+import ReadingView from "@/views/ReadingView.vue";
 
 const routes = [
   {
@@ -22,6 +23,11 @@ const routes = [
     name: "Homepage",
     path: "/home",
     component: HomepageView,
+  },
+  {
+    name: "ReadingPage",
+    path: "/read/:userId/:shareSlug",
+    component: ReadingView,
   },
   {
     name: "Settings",
@@ -51,6 +57,9 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, from) => {
+  if (to.name === "ReadingPage") {
+    return true;
+  }
   const isAuthenticated = await getAuthStatus();
   if (isAuthenticated) {
     if (to.path === "/" || to.name === "Login" || to.name === "Register") {

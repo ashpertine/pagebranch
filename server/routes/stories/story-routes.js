@@ -38,4 +38,10 @@ storyRouter.patch(
   storyController.updateStoryPin,
 );
 
+storyRouter.patch(
+  "/:storyId/privacy",
+  checkAuthenticated,
+  storyController.toggleStoryPrivacy,
+);
+
 export { storyRouter };

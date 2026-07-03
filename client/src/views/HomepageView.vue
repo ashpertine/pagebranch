@@ -36,6 +36,7 @@ const nonPinnedStories = computed(() => {
 
 onMounted(async () => {
   await getStories();
+  console.log(stories.value);
 })
 
 </script>
@@ -48,7 +49,9 @@ onMounted(async () => {
         <v-row density="comfortable">
           <v-col v-for="story in pinnedStories" xl="3" lg="4" md="6" cols="12" :key="story.id">
             <StoryCard :title="story.story_title" :story-id="story.id" :created-at=story.created_at
-              :is-pinned="story.is_pinned" :updated-at=story.updated_at @stories-updated="getStories" />
+              :is-pinned="story.is_pinned" :updated-at=story.updated_at @stories-updated="getStories"
+              :is-private="story.is_private" :start-passage-id="story.start_passage_id" :author-id="story.author_id"
+              :share-slug="story.share_slug" />
           </v-col>
         </v-row>
       </v-container>
@@ -57,7 +60,9 @@ onMounted(async () => {
         <v-row density="comfortable">
           <v-col v-for="story in nonPinnedStories" xl="3" lg="4" md="6" cols="12" :key="story.id">
             <StoryCard :title="story.story_title" :story-id="story.id" :created-at=story.created_at
-              :is-pinned="story.is_pinned" :updated-at=story.updated_at @stories-updated="getStories" />
+              :is-pinned="story.is_pinned" :updated-at=story.updated_at @stories-updated="getStories"
+              :is-private="story.is_private" :start-passage-id="story.start_passage_id" :author-id="story.author_id"
+              :share-slug="story.share_slug" />
           </v-col>
         </v-row>
       </v-container>

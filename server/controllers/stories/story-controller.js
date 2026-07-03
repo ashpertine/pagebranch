@@ -151,6 +151,32 @@ async function updateStoryPin(req, res) {
   }
 }
 
+async function toggleStoryPrivacy(req, res) {
+  try {
+    const userId = req.session.passport.user;
+    const storyId = req.params.storyId;
+    if (!storyId) {
+      return res.status(400).json({
+        errorMsg: "story id is undefined!",
+      });
+    }
+
+    const results = await storyQueries.toggleStoryPrivacyById(userId, storyId);
+    if (results === null) {
+      return res.status(400).json({ errorMsg: "No start passage id." });
+    }
+    if (results.length === 0) {
+      return res.status(404).json({ errorMsg: "Story not found" });
+    }
+    return res.status(200).json(results);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      errorMsg: error.toString(),
+    });
+  }
+}
+
 export default {
   getStoryContent,
   getUserStories,
@@ -158,4 +184,5 @@ export default {
   updateStory,
   deleteStory,
   updateStoryPin,
+  toggleStoryPrivacy,
 };

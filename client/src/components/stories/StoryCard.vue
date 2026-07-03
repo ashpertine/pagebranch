@@ -3,12 +3,12 @@ import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import StoryDeleteDialog from './StoryDeleteDialog.vue';
 import StoryUpdateDialog from './StoryUpdateDialog.vue';
-const props = defineProps(['title', 'storyId', 'createdAt', 'updatedAt', 'isPinned']);
+const props = defineProps(['title', 'storyId', 'authorId', 'createdAt', 'updatedAt', 'isPinned', 'isPrivate', 'startPassageId', 'shareSlug']);
 const emit = defineEmits(['stories-updated']);
 const router = useRouter();
 const deleteDialog = ref(false);
 const updateDialog = ref(false);
-import { createUpdatePinRequest } from "../../api/stories-api";
+import { createUpdatePinRequest, createTogglePrivacyRequest } from "../../api/stories-api";
 
 const titleTruncated = computed(() => {
   if (props.title.length > 22) {
@@ -26,6 +26,18 @@ async function goToEditor() {
         props.storyId,
     },
   });
+}
+
+async function viewStory() {
+  console.log(props.authorId);
+  console.log(props.shareSlug);
+  router.push({
+    name: "ReadingPage",
+    params: {
+      userId: props.authorId,
+      shareSlug: props.shareSlug
+    }
+  })
 }
 
 const updatedAtFormatted = computed(() => {
@@ -55,6 +67,15 @@ async function savePinUpdate() {
   }
   emit('stories-updated');
 }
+
+async function saveTogglePrivacy() {
+  const response = await createTogglePrivacyRequest(props.storyId);
+  if (response.responseErr) {
+    return router.replace({ name: "Error" })
+  }
+  emit('stories-updated');
+}
+
 </script>
 <template>
   <v-card>
@@ -73,6 +94,21 @@ async function savePinUpdate() {
           <v-icon-btn icon="mdi-dots-vertical" v-bind="props"></v-icon-btn>
         </template>
         <v-list>
+          <v-list-item value="privacy" prepend-icon="mdi-eye" @click="saveTogglePrivacy" v-if="startPassageId">
+            <v-list-item-title>
+              Set as {{ isPrivate ? 'public' : 'private' }}
+            </v-list-item-title>
+          </v-list-item>
+          <v-tooltip text="Please set a start passage before changing this settings." v-else>
+            <template v-slot:activator="{ props }">
+              <v-list-item value="privacy" prepend-icon="mdi-eye" class="text-disabled" v-bind="props"
+                @hover="(event) => event.preventDefault()" :ripple="false">
+                <v-list-item-title v-bind="props" class="text-disabled">
+                  Set as {{ isPrivate ? 'public' : 'private' }}
+                </v-list-item-title>
+              </v-list-item>
+            </template>
+          </v-tooltip>
           <v-list-item value="pin" prepend-icon="mdi-pin-off" @click="savePinUpdate" v-if="isPinned">
             <v-list-item-title>
               Unpin
@@ -100,7 +136,9 @@ async function savePinUpdate() {
       <span class="text-title-small"> Updated: {{ updatedAtFormatted }} (Created: {{ createdAtFormatted }})</span>
     </v-card-subtitle>
     <v-card-actions class="d-flex justify-end">
-      <v-btn variant="flat" class="px-4" @click="goToEditor">Edit</v-btn>
+      <v-btn variant="flat" class="px-4" color="info" @click="viewStory" v-if="!isPrivate">View
+        Story</v-btn>
+      <v-btn variant="flat" class="px-4" color="success" @click="goToEditor">Edit</v-btn>
     </v-card-actions>
   </v-card>
   <StoryDeleteDialog v-model="deleteDialog" @close-delete-dialog="deleteDialog = false" :story-id="storyId"
