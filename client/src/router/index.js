@@ -3,7 +3,7 @@ import RegisterView from "../views/RegisterView.vue";
 import LoginView from "../views/LoginView.vue";
 import HomepageView from "../views/HomepageView.vue";
 import EditorView from "../views/EditorView.vue";
-import { getAuthStatus } from "./router-helpers.js";
+import { createGetAuthStatusRequest } from "../api/auth-api";
 import ErrorView from "@/views/ErrorView.vue";
 import SettingsView from "@/views/SettingsView.vue";
 import ReadingView from "@/views/ReadingView.vue";
@@ -60,7 +60,11 @@ router.beforeEach(async (to, from) => {
   if (to.name === "ReadingPage") {
     return true;
   }
-  const isAuthenticated = await getAuthStatus();
+
+  const response = await createGetAuthStatusRequest();
+  const body = await response.json();
+  const isAuthenticated = body.currentUser ? true : false;
+
   if (isAuthenticated) {
     if (to.path === "/" || to.name === "Login" || to.name === "Register") {
       return { name: "Homepage" };

@@ -3,7 +3,7 @@ import { onMounted } from "vue";
 import { useSettings } from "./composables/settings.js";
 
 import { useTheme } from "vuetify";
-const { initSettings, localSettings } = useSettings();
+const { initSettings, localSettings, storeCurrentUser } = useSettings();
 
 const theme = useTheme();
 

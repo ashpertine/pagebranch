@@ -3,8 +3,11 @@ import { ref, onMounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { createGetStartPassageRequest, createGetReadContentRequest } from "../api/story-content-api";
 import { marked } from "marked";
+import { useSettings } from "../composables/settings";
+import AppBar from "../components/AppBar.vue";
 const route = useRoute();
 const router = useRouter();
+const { globalUserId, storeCurrentUser } = useSettings();
 
 async function getReadContent() {
   const response = await createGetReadContentRequest(route.params.userId, route.params.shareSlug);
@@ -86,6 +89,7 @@ function prevPassage() {
 }
 
 function nextPassage() {
+  if (passageHistory.value[passageHistory.value.length - 1] === currentPassage.value.id) return;
   const choices = readContent.value.choices.filter(choice => choice.from_passage_id === currentPassage.value.id);
   if (choices.length === 0) return;
   const matchingPassagesWithIndex = choices.map(choice => {
@@ -102,13 +106,17 @@ function nextPassage() {
   currentPassage.value = latestPassage;
 }
 
+const isEnd = ref(false);
+
 onMounted(async () => {
   const content = await getReadContent();
+  await storeCurrentUser();
   readContent.value = content;
 })
 </script>
 <template>
   <v-app>
+    <AppBar @stories-updated="" bar-title="Preview Story" v-if="readContent.metadata.is_owner" />
     <v-main>
       <v-container class="d-flex justify-center align-center w-100 h-100 cover-page" v-if="currentPassage === null">
         <v-sheet :elevation="2" rounded="lg"
@@ -128,7 +136,32 @@ onMounted(async () => {
           </v-btn>
         </v-sheet>
       </v-container>
-      <v-container v-else class="d-flex justify-center flex-column py-12 w-xxl-25 w-50">
+
+      <v-container v-else-if="isEnd" class="d-flex justify-center align-center w-100 h-100 cover-page">
+        <v-sheet :elevation="2" rounded="lg"
+          class="w-lg-50 w-md-75 w-sm-100 w-100 d-flex flex-column align-center justify-space-between pa-12"
+          height="520">
+          <v-icon icon="mdi-book-open-variant" size="48" color="primary" />
+
+          <div class="d-flex flex-column align-center ga-4 text-center">
+            <div class="text-display-medium font-weight-light">You have reached the end of the story.</div>
+            <v-divider class="w-25" v-if="Number(globalUserId) !== Number(route.params.userId)" />
+            <v-btn color="primary" size="large" append-icon="mdi-star"
+              @click="currentPassage = null; passageHistory = []; isEnd = false;"
+              v-if="Number(globalUserId) !== Number(route.params.userId)">
+              Rate this story!
+            </v-btn>
+          </div>
+
+          <v-btn variant="tonal" color="success" append-icon="mdi-refresh"
+            @click="currentPassage = null; passageHistory = []; isEnd = false;">
+            Return to Beginning
+          </v-btn>
+        </v-sheet>
+      </v-container>
+
+      <v-container v-else @keyup.left="prevPassage" @keyup.right="nextPassage"
+        class="d-flex justify-center flex-column py-12 w-xxl-25 w-50">
         <div class="nav-buttons align-self-start"
           style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 16px;">
           <v-icon-btn icon="mdi-arrow-left" variant="tonal" @click="prevPassage"
@@ -139,9 +172,7 @@ onMounted(async () => {
         <div class="passage-title text-h4 font-weight-medium mb-8">
           {{ currentContent.title }}
         </div>
-
         <div v-html="currentContent.description" class="passage-body mb-10" />
-
         <template v-if="currentContent.choiceOptions.length > 0">
           <v-divider class="mb-4" />
           <div class="text-body-2 text-medium-emphasis mb-3">Pick an option</div>
@@ -152,6 +183,13 @@ onMounted(async () => {
               {{ choice.label }}
             </v-btn>
           </div>
+        </template>
+        <template v-else-if="currentContent.choiceOptions.length === 0">
+          <v-divider class="mb-4" />
+          <v-btn variant="tonal" color="info" class="justify-space-between" append-icon="mdi-exit-run"
+            @click="isEnd = true">
+            Ending
+          </v-btn>
         </template>
       </v-container>
     </v-main>

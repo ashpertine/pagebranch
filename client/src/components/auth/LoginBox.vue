@@ -8,7 +8,7 @@ import { useRouter } from "vue-router";
 
 
 const theme = useTheme();
-const { initSettings, localSettings } = useSettings();
+const { initSettings, localSettings, storeCurrentUser } = useSettings();
 const router = useRouter();
 
 const usernameRules = [

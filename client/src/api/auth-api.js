@@ -30,4 +30,16 @@ async function createLogoutRequest() {
   return response;
 }
 
-export { createRegisterRequest, createLoginRequest, createLogoutRequest };
+async function createGetAuthStatusRequest() {
+  const response = await fetch("/api/loginStatus", {
+    method: "GET",
+  });
+  return response;
+}
+
+export {
+  createRegisterRequest,
+  createLoginRequest,
+  createLogoutRequest,
+  createGetAuthStatusRequest,
+};

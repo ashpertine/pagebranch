@@ -3,9 +3,11 @@ import {
   createGetSettingsRequest,
   createUpdateSettingsRequest,
 } from "../api/settings-api.js";
+import { createGetAuthStatusRequest } from "../api/auth-api.js";
 import { useRouter } from "vue-router";
 
 const localSettings = ref({});
+const globalUserId = ref(null);
 const defaultNodePosition = 150;
 function useSettings() {
   const router = useRouter();
@@ -25,13 +27,27 @@ function useSettings() {
       localSettings.value = content.default;
     }
 
-    localSettings.value = content.results.preferences;
+    if (content.results) {
+      localSettings.value = content.results.preferences;
+    }
+  }
+
+  async function storeCurrentUser() {
+    const response = await createGetAuthStatusRequest();
+    const content = await response.json();
+    if (!response.ok) {
+      return;
+    }
+    const currentUser = content.userId;
+    globalUserId.value = currentUser;
   }
 
   return {
     saveUpdateSettings,
     initSettings,
     localSettings,
+    globalUserId,
+    storeCurrentUser,
     defaultNodePosition,
   };
 }
