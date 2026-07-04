@@ -16,7 +16,7 @@ const SQL = `
       story_title VARCHAR(255) NOT NULL,
       start_passage_id INTEGER,
       is_pinned BOOLEAN NOT NULL DEFAULT false,
-      is_private BOOLEAN NOT NULL DEFAULT false, 
+      is_private BOOLEAN NOT NULL DEFAULT true, 
       share_slug VARCHAR(255) UNIQUE NOT NULL,
       updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
       created_at TIMESTAMPTZ NOT NULL DEFAULT now(),

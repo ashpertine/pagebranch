@@ -14,7 +14,7 @@
   top: 10px;
   border-right: 10px solid transparent;
   border-top: 10px solid transparent;
-  border-left: 10px solid #45c69d;
+  border-left: 10px solid rgb(var(--v-theme-success));
   border-bottom: 10px solid transparent;
 }
 </style>

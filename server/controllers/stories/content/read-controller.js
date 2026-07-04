@@ -25,6 +25,8 @@ async function getReadStoryContent(req, res) {
     }
 
     const storyId = story.id;
+    const authorName = (await storyQueries.getAuthorNameById(viewUserId))[0]
+      .username;
 
     const passagesResults = await passageQueries.getPassagesByStoryId(
       viewUserId,
@@ -36,6 +38,11 @@ async function getReadStoryContent(req, res) {
     );
 
     return res.status(200).json({
+      metadata: {
+        author: authorName,
+        title: story.story_title,
+        start_passage: story.start_passage_id,
+      },
       passages: passagesResults,
       choices: choicesResults,
     });
