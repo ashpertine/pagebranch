@@ -4,6 +4,7 @@ import { useRoute, useRouter } from "vue-router";
 import { createGetStartPassageRequest, createGetReadContentRequest } from "../api/story-content-api";
 import { marked } from "marked";
 import { useSettings } from "../composables/settings";
+import RatingDialog from "../components/rating/RatingDialog.vue";
 import AppBar from "../components/AppBar.vue";
 const route = useRoute();
 const router = useRouter();
@@ -18,6 +19,7 @@ async function getReadContent() {
   return content;
 }
 
+const ratingDialog = ref(false);
 
 const readContent = ref({
   metadata: {},
@@ -146,11 +148,12 @@ onMounted(async () => {
           <div class="d-flex flex-column align-center ga-4 text-center">
             <div class="text-display-medium font-weight-light">You have reached the end of the story.</div>
             <v-divider class="w-25" v-if="Number(globalUserId) !== Number(route.params.userId)" />
-            <v-btn color="primary" size="large" append-icon="mdi-star"
-              @click="currentPassage = null; passageHistory = []; isEnd = false;"
+            <v-btn color="primary" size="large" append-icon="mdi-star" @click="ratingDialog = true"
               v-if="Number(globalUserId) !== Number(route.params.userId)">
               Rate this story!
             </v-btn>
+            <RatingDialog @close-rating-dialog="ratingDialog = false" @rating-sent="" :global-user-id="globalUserId" ,
+              :view-user-id="$route.params.userId" v-model="ratingDialog" />
           </div>
 
           <v-btn variant="tonal" color="success" append-icon="mdi-refresh"

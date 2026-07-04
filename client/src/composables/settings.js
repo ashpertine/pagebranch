@@ -39,7 +39,7 @@ function useSettings() {
       return;
     }
     const currentUser = content.userId;
-    globalUserId.value = currentUser;
+    globalUserId.value = content.currentUser ? currentUser : null;
   }
 
   return {
