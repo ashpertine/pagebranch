@@ -6,8 +6,18 @@ import { useRouter } from "vue-router";
 const errorMsg = ref("");
 const router = useRouter();
 
+const rating = ref(3); // default rating
+const ratingDesc = ref("");
+
 const emit = defineEmits(["rating-sent", "close-rating-dialog"]);
 const props = defineProps(["globalUserId", "viewUserId"]);
+
+const ratingDescRules = [
+  value => {
+    if (value.length > 1000) return "The description cannot be more than 1000 characters.";
+    return true;
+  }
+]
 </script>
 <template>
   <v-dialog max-width="500">
@@ -15,8 +25,12 @@ const props = defineProps(["globalUserId", "viewUserId"]);
       <v-card-title>Rate Story</v-card-title>
       <v-card-subtitle>Give this story a rating out of 5 stars</v-card-subtitle>
       <div class="text-title-medium text-red-lighten-2 pb-4 px-5 rounded-md" v-if="errorMsg.length !== 0"> {{ errorMsg
-        }}</div>
+      }}</div>
       <v-form class="px-5">
+        <v-rating hover :length="5" size="50" v-model="rating" active-color="orange-lighten-1"
+          color="orange-lighten-1" />
+        <v-textarea label="Description (optional, max 1000 characters)" :rules="ratingDescRules" v-model="ratingDesc"
+          variant="solo-filled" no-resize></v-textarea>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn text="Submit" color="success" size="large" @click="$emit('close-rating-dialog')"></v-btn>

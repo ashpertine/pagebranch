@@ -30,11 +30,17 @@ const SQL = `
   CREATE TABLE IF NOT EXISTS ratings (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     story_id INTEGER NOT NULL,
+    from_user_id INTEGER NOT NULL,
     rating INTEGER NOT NULL,
     description VARCHAR(1000),
     CONSTRAINT ratings_story_fk
       FOREIGN KEY (story_id)
       REFERENCES stories(id)
+      ON UPDATE CASCADE
+      ON DELETE CASCADE
+    CONSTRAINT ratings_user_fk
+      FOREIGN KEY (from_user_id)
+      REFERENCES users(id)
       ON UPDATE CASCADE
       ON DELETE CASCADE
   );

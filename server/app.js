@@ -9,6 +9,7 @@ import { choiceRouter } from "./routes/stories/content/choice-routes.js";
 import { passageRouter } from "./routes/stories/content/passage-routes.js";
 import { settingsRouter } from "./routes/settings-routes.js";
 import { readRouter } from "./routes/stories/content/read-router.js";
+import { ratingRouter } from "./routes/stories/rating/rating-routes.js";
 import cors from "cors";
 
 const pgSession = PGSimple(session);
@@ -49,6 +50,7 @@ app.use("/api/stories", passageRouter);
 app.use("/api/stories", choiceRouter);
 app.use("/api/settings", settingsRouter);
 app.use("/api/read", readRouter);
+app.use("/api/rating", ratingRouter);
 
 // Catch all - 404
 app.use((req, res) => {
