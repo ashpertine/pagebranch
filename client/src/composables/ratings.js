@@ -30,14 +30,20 @@ export function useRatings() {
   }
 
   const ratingDialog = ref(false);
-  const ratingsContent = ref({
+  const ratingSent = ref(false);
+  const ratingContent = ref({
     results: [],
     is_logged_in: null,
     has_submitted_rating: null,
   });
 
+  function handleRatingSent() {
+    ratingSent.value = true;
+    ratingContent.value.has_submitted_rating = true;
+  }
+
   const ratings = computed(() => {
-    return ratingsContent.value.results.map((ratingObj) => ratingObj.rating);
+    return ratingContent.value.results.map((ratingObj) => ratingObj.rating);
   });
 
   const ratingsAvg = computed(() => {
@@ -56,7 +62,9 @@ export function useRatings() {
     getRatings,
     addNewRating,
     ratingDialog,
-    ratingsContent,
+    ratingContent,
+    ratingSent,
+    handleRatingSent,
     ratings,
     ratingsAvg,
     ratingsCount,

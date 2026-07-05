@@ -31,8 +31,10 @@ async function insertNewRating(story_id, user_id, rating, description) {
 }
 
 async function getRatingsByStoryId(story_id, is_logged_in) {
-  const selectCols = is_logged_in ? "*" : "rating";
-  const SQL = `SELECT ${selectCols} FROM ratings WHERE story_id = $1`;
+  const selectCols = is_logged_in
+    ? "story_id, rating, description, users.username AS from_user_name, from_user_id, created_at"
+    : "rating";
+  const SQL = `SELECT ${selectCols} FROM ratings LEFT JOIN users ON ratings.from_user_id = users.id WHERE story_id = $1`;
   const { rows } = await pbPool.query(SQL, [story_id]);
   return rows;
 }

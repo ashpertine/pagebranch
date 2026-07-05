@@ -26,14 +26,7 @@ const registerValidation = [
 ];
 
 const newStoryValidation = [
-  body("story_title")
-    .notEmpty()
-    .withMessage("Title is empty!")
-    .trim()
-    .isAlphanumeric("en-US", {
-      ignore: " ",
-    })
-    .withMessage("No special characters are allowed in the title."),
+  body("story_title").notEmpty().withMessage("Title is empty!").trim(),
 ];
 
 export { registerValidation, newStoryValidation };

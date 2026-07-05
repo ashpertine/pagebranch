@@ -7,6 +7,7 @@ import { createGetAuthStatusRequest } from "../api/auth-api";
 import ErrorView from "@/views/ErrorView.vue";
 import SettingsView from "@/views/SettingsView.vue";
 import ReadingView from "@/views/ReadingView.vue";
+import RatingView from "@/views/RatingView.vue";
 
 const routes = [
   {
@@ -28,6 +29,11 @@ const routes = [
     name: "ReadingPage",
     path: "/read/:userId/:shareSlug",
     component: ReadingView,
+  },
+  {
+    name: "RatingsPage",
+    path: "/rating/:storyId",
+    component: RatingView,
   },
   {
     name: "Settings",

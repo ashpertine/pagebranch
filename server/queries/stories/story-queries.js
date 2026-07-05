@@ -25,6 +25,12 @@ async function getStoriesByTitle(story_title, user_id) {
   return rows;
 }
 
+async function getStoryById(story_id, user_id) {
+  const SQL = `SELECT * FROM stories WHERE id =  $1 AND author_id = $2`;
+  const { rows } = await pbPool.query(SQL, [story_id, user_id]);
+  return rows[0];
+}
+
 async function getAuthorNameById(user_id) {
   const SQL = `SELECT username FROM users WHERE id = $1`;
   const { rows } = await pbPool.query(SQL, [user_id]);
@@ -112,6 +118,7 @@ async function toggleStoryPrivacyById(user_id, story_id) {
 
 export default {
   getStoriesByTitle,
+  getStoryById,
   getStoryByUserAndSlug,
   getAllStoriesByUser,
   getAuthorNameById,

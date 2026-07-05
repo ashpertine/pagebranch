@@ -33,6 +33,7 @@ const SQL = `
     from_user_id INTEGER NOT NULL,
     rating INTEGER NOT NULL,
     description VARCHAR(1000),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     CONSTRAINT ratings_story_fk
       FOREIGN KEY (story_id)
       REFERENCES stories(id)

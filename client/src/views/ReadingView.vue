@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { createGetStartPassageRequest, createGetReadContentRequest } from "../api/story-content-api";
+import { createGetReadContentRequest } from "../api/story-content-api";
 import { marked } from "marked";
 import { useSettings } from "../composables/settings.js";
 import { useRatings } from "../composables/ratings.js";
@@ -10,9 +10,8 @@ import AppBar from "../components/AppBar.vue";
 const route = useRoute();
 const router = useRouter();
 const { globalUserId, storeCurrentUser } = useSettings();
-const { getRatings, ratingDialog, ratingsContent, ratings, ratingsAvg, ratingsCount } = useRatings();
+const { getRatings, ratingDialog, ratingSent, handleRatingSent, ratingContent, ratings, ratingsAvg, ratingsCount } = useRatings();
 
-const ratingSent = ref(false);
 
 async function getReadContent() {
   const response = await createGetReadContentRequest(route.params.userId, route.params.shareSlug);
@@ -31,6 +30,7 @@ const readContent = ref({
 
 const currentPassage = ref(null);
 const passageHistory = ref([]);
+const transitionName = ref("slide-next");
 
 const currentContent = computed(() => {
   if (currentPassage.value === null) {
@@ -71,6 +71,7 @@ const nextBtnEnabled = computed(() => {
 
 function readPassage(passage_id) {
   const passage = readContent.value.passages.find(passage => passage.id === passage_id);
+  transitionName.value = "slide-next";
   currentPassage.value = passage;
   passageHistory.value.push(passage.id);
 }
@@ -89,6 +90,7 @@ function prevPassage() {
   const latestPassageIndex = Math.max(...matchingPassagesWithIndex.map(passage => passage.index));
   const latestPassage = readContent.value.passages.find(passage => passage.id === (matchingPassagesWithIndex.find(passage => passage.index === latestPassageIndex)).passage_id);
 
+  transitionName.value = "slide-prev";
   currentPassage.value = latestPassage;
 }
 
@@ -107,6 +109,7 @@ function nextPassage() {
   const latestPassageIndex = Math.max(...matchingPassagesWithIndex.map(passage => passage.index));
   const latestPassage = readContent.value.passages.find(passage => passage.id === (matchingPassagesWithIndex.find(passage => passage.index === latestPassageIndex)).passage_id);
 
+  transitionName.value = "slide-next";
   currentPassage.value = latestPassage;
 }
 
@@ -119,7 +122,7 @@ onMounted(async () => {
 
   // get ratings only after settings readContent
   const initRatingsContent = await getRatings(readContent.value.metadata.story_id);
-  ratingsContent.value = initRatingsContent;
+  ratingContent.value = initRatingsContent;
 })
 </script>
 <template>
@@ -134,7 +137,8 @@ onMounted(async () => {
             half-increments :model-value="ratingsAvg" />
           <div class="d-flex flex-column align-center">
             <v-icon icon="mdi-book-open-variant" size="48" color="primary" />
-            <div class="text-headline-small text-medium-emphasis">Rating: {{ ratingsAvg }} ({{ ratingsCount }})</div>
+            <div class="text-headline-small text-medium-emphasis">Rating: {{ ratingsAvg }} ({{ ratingsCount }} ratings)
+            </div>
           </div>
 
           <div class="d-flex flex-column align-center ga-4 text-center">
@@ -165,25 +169,30 @@ onMounted(async () => {
             </v-btn>
 
             <v-btn color="primary" size="large" append-icon="mdi-star" @click="ratingDialog = true"
-              v-else-if="Number(globalUserId) !== Number(route.params.userId) && !ratingsContent.has_submitted_rating">
+              v-else-if="Number(globalUserId) !== Number(route.params.userId) && !ratingContent.has_submitted_rating">
               Rate this story!
             </v-btn>
 
             <v-btn color="grey" size="large" variant="tonal" append-icon="mdi-star" @click="ratingDialog = true"
-              v-else-if="Number(globalUserId) !== Number(route.params.userId) && ratingsContent.has_submitted_rating"
+              v-else-if="Number(globalUserId) !== Number(route.params.userId) && ratingContent.has_submitted_rating"
               disabled>
               You have already submitted a rating.
             </v-btn>
 
             <RatingDialog :storyId="readContent.metadata.story_id" @close-rating-dialog="ratingDialog = false"
-              @rating-sent="ratingSent = true" :global-user-id="globalUserId" , :view-user-id="$route.params.userId"
+              @rating-sent="handleRatingSent" :global-user-id="globalUserId" , :view-user-id="$route.params.userId"
               v-model="ratingDialog" />
           </div>
 
-          <v-btn variant="tonal" color="success" append-icon="mdi-refresh"
-            @click="currentPassage = null; passageHistory = []; isEnd = false; ratingSent = false;">
-            Return to Beginning
-          </v-btn>
+          <div class="d-flex ga-4">
+            <v-btn variant="tonal" color="success" append-icon="mdi-refresh"
+              @click="currentPassage = null; passageHistory = []; isEnd = false; ratingSent = false;">
+              Return to Beginning
+            </v-btn>
+            <v-btn @click="router.push({ name: 'Homepage' })" color="secondary">
+              Go Home
+            </v-btn>
+          </div>
         </v-sheet>
       </v-container>
 
@@ -196,28 +205,32 @@ onMounted(async () => {
           <v-icon-btn icon="mdi-arrow-right" variant="tonal" @click="nextPassage"
             :disabled="!nextBtnEnabled"></v-icon-btn>
         </div>
-        <div class="passage-title text-h4 font-weight-medium mb-8">
-          {{ currentContent.title }}
-        </div>
-        <div v-html="currentContent.description" class="passage-body mb-10" />
-        <template v-if="currentContent.choiceOptions.length > 0">
-          <v-divider class="mb-4" />
-          <div class="text-body-2 text-medium-emphasis mb-3">Pick an option</div>
-          <div class="d-flex flex-column ga-2">
-            <v-btn v-for="choice in currentContent.choiceOptions" :key="choice.to_passage_id" variant="tonal"
-              color="primary" class="justify-space-between" append-icon="mdi-arrow-right"
-              @click="readPassage(choice.to_passage_id)">
-              {{ choice.label }}
-            </v-btn>
+        <Transition :name="transitionName" mode="out-in">
+          <div :key="currentPassage.id" class="passage-slide">
+            <div class="passage-title text-h4 font-weight-medium mb-8">
+              {{ currentContent.title }}
+            </div>
+            <div v-html="currentContent.description" class="passage-body mb-10" />
+            <template v-if="currentContent.choiceOptions.length > 0">
+              <v-divider class="mb-4" />
+              <div class="text-body-2 text-medium-emphasis mb-3">Pick an option</div>
+              <div class="d-flex flex-column ga-2">
+                <v-btn v-for="choice in currentContent.choiceOptions" :key="choice.to_passage_id" variant="tonal"
+                  color="primary" class="justify-space-between" append-icon="mdi-arrow-right"
+                  @click="readPassage(choice.to_passage_id)">
+                  {{ choice.label }}
+                </v-btn>
+              </div>
+            </template>
+            <template v-else-if="currentContent.choiceOptions.length === 0">
+              <v-divider class="mb-4" />
+              <v-btn variant="tonal" color="info" class="justify-space-between" append-icon="mdi-exit-run"
+                @click="isEnd = true">
+                Ending
+              </v-btn>
+            </template>
           </div>
-        </template>
-        <template v-else-if="currentContent.choiceOptions.length === 0">
-          <v-divider class="mb-4" />
-          <v-btn variant="tonal" color="info" class="justify-space-between" append-icon="mdi-exit-run"
-            @click="isEnd = true">
-            Ending
-          </v-btn>
-        </template>
+        </Transition>
       </v-container>
     </v-main>
   </v-app>
@@ -241,5 +254,35 @@ onMounted(async () => {
 
 .passage-body :deep(p:last-child) {
   margin-bottom: 0;
+}
+
+/* Horizontal slide transition between passages */
+.slide-next-enter-active,
+.slide-next-leave-active,
+.slide-prev-enter-active,
+.slide-prev-leave-active {
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.6s ease;
+}
+
+/* Forward navigation */
+.slide-next-enter-from {
+  transform: translateX(60px);
+  opacity: 0;
+}
+
+.slide-next-leave-to {
+  transform: translateX(-60px);
+  opacity: 0;
+}
+
+/* Backward navigation */
+.slide-prev-enter-from {
+  transform: translateX(-60px);
+  opacity: 0;
+}
+
+.slide-prev-leave-to {
+  transform: translateX(60px);
+  opacity: 0;
 }
 </style>

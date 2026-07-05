@@ -47,6 +47,27 @@ async function getUserStories(req, res) {
   }
 }
 
+async function getUserStoryById(req, res) {
+  try {
+    const userId = req.session.passport.user;
+    const storyId = req.params.storyId;
+    const results = await storyQueries.getStoryById(storyId, userId);
+
+    if (results.length === 0) {
+      return res.status(404).json({
+        errorMsg: "Story not found!",
+      });
+    }
+
+    return res.status(200).json(results);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      errorMsg: error.toString(),
+    });
+  }
+}
+
 async function postNewStory(req, res) {
   try {
     const result = validationResult(req);
@@ -180,6 +201,7 @@ async function toggleStoryPrivacy(req, res) {
 export default {
   getStoryContent,
   getUserStories,
+  getUserStoryById,
   postNewStory,
   updateStory,
   deleteStory,

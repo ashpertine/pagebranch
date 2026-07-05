@@ -134,8 +134,10 @@ async function saveTogglePrivacy() {
       <span class="text-title-small"> Updated: {{ updatedAtFormatted }} (Created: {{ createdAtFormatted }})</span>
     </v-card-subtitle>
     <v-card-actions class="d-flex justify-end">
-      <v-btn variant="flat" class="px-4" color="info" @click="viewStory" v-if="!isPrivate">View
-        Story</v-btn>
+      <v-btn variant="flat" class="px-4" color="orange-lighten-2"
+        @click="$router.push({ path: `/rating/${props.storyId}` })" v-if="!isPrivate">
+        Ratings</v-btn>
+      <v-btn variant="flat" class="px-4" color="info" @click="viewStory" v-if="!isPrivate">View</v-btn>
       <v-btn variant="flat" class="px-4" color="success" @click="goToEditor">Edit</v-btn>
     </v-card-actions>
   </v-card>
