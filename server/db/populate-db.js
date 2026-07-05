@@ -37,12 +37,14 @@ const SQL = `
       FOREIGN KEY (story_id)
       REFERENCES stories(id)
       ON UPDATE CASCADE
-      ON DELETE CASCADE
+      ON DELETE CASCADE,
     CONSTRAINT ratings_user_fk
       FOREIGN KEY (from_user_id)
       REFERENCES users(id)
       ON UPDATE CASCADE
-      ON DELETE CASCADE
+      ON DELETE CASCADE,
+    CONSTRAINT ratings_user_unique
+      UNIQUE (story_id, from_user_id)
   );
 
   CREATE TABLE IF NOT EXISTS settings (

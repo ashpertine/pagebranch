@@ -3,12 +3,16 @@ import { ref, onMounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { createGetStartPassageRequest, createGetReadContentRequest } from "../api/story-content-api";
 import { marked } from "marked";
-import { useSettings } from "../composables/settings";
+import { useSettings } from "../composables/settings.js";
+import { useRatings } from "../composables/ratings.js";
 import RatingDialog from "../components/rating/RatingDialog.vue";
 import AppBar from "../components/AppBar.vue";
 const route = useRoute();
 const router = useRouter();
 const { globalUserId, storeCurrentUser } = useSettings();
+const { getRatings, ratingDialog, ratingsContent, ratings, ratingsAvg, ratingsCount } = useRatings();
+
+const ratingSent = ref(false);
 
 async function getReadContent() {
   const response = await createGetReadContentRequest(route.params.userId, route.params.shareSlug);
@@ -18,8 +22,6 @@ async function getReadContent() {
   }
   return content;
 }
-
-const ratingDialog = ref(false);
 
 const readContent = ref({
   metadata: {},
@@ -111,9 +113,13 @@ function nextPassage() {
 const isEnd = ref(false);
 
 onMounted(async () => {
-  const content = await getReadContent();
+  const initReadContent = await getReadContent();
   await storeCurrentUser();
-  readContent.value = content;
+  readContent.value = initReadContent;
+
+  // get ratings only after settings readContent
+  const initRatingsContent = await getRatings(readContent.value.metadata.story_id);
+  ratingsContent.value = initRatingsContent;
 })
 </script>
 <template>
@@ -124,7 +130,12 @@ onMounted(async () => {
         <v-sheet :elevation="2" rounded="lg"
           class="w-lg-50 w-md-75 w-sm-100 w-100 d-flex flex-column align-center justify-space-between pa-12"
           height="520">
-          <v-icon icon="mdi-book-open-variant" size="48" color="primary" />
+          <v-rating hover :length="5" size="50" active-color="orange-lighten-1" color="orange-lighten-1" readonly
+            half-increments :model-value="ratingsAvg" />
+          <div class="d-flex flex-column align-center">
+            <v-icon icon="mdi-book-open-variant" size="48" color="primary" />
+            <div class="text-headline-small text-medium-emphasis">Rating: {{ ratingsAvg }} ({{ ratingsCount }})</div>
+          </div>
 
           <div class="d-flex flex-column align-center ga-4 text-center">
             <div class="text-display-medium font-weight-light">{{ readContent.metadata.title }}</div>
@@ -144,27 +155,40 @@ onMounted(async () => {
           class="w-lg-50 w-md-75 w-sm-100 w-100 d-flex flex-column align-center justify-space-between pa-12"
           height="520">
           <v-icon icon="mdi-book-open-variant" size="48" color="primary" />
-
           <div class="d-flex flex-column align-center ga-4 text-center">
             <div class="text-display-medium font-weight-light">You have reached the end of the story.</div>
             <v-divider class="w-25" v-if="Number(globalUserId) !== Number(route.params.userId)" />
+
+            <v-btn color="success" variant="tonal" size="large" append-icon="mdi-check-circle" @click.prevent=""
+              v-if="ratingSent" :ripple="false">
+              Rating sent!
+            </v-btn>
+
             <v-btn color="primary" size="large" append-icon="mdi-star" @click="ratingDialog = true"
-              v-if="Number(globalUserId) !== Number(route.params.userId)">
+              v-else-if="Number(globalUserId) !== Number(route.params.userId) && !ratingsContent.has_submitted_rating">
               Rate this story!
             </v-btn>
-            <RatingDialog @close-rating-dialog="ratingDialog = false" @rating-sent="" :global-user-id="globalUserId" ,
-              :view-user-id="$route.params.userId" v-model="ratingDialog" />
+
+            <v-btn color="grey" size="large" variant="tonal" append-icon="mdi-star" @click="ratingDialog = true"
+              v-else-if="Number(globalUserId) !== Number(route.params.userId) && ratingsContent.has_submitted_rating"
+              disabled>
+              You have already submitted a rating.
+            </v-btn>
+
+            <RatingDialog :storyId="readContent.metadata.story_id" @close-rating-dialog="ratingDialog = false"
+              @rating-sent="ratingSent = true" :global-user-id="globalUserId" , :view-user-id="$route.params.userId"
+              v-model="ratingDialog" />
           </div>
 
           <v-btn variant="tonal" color="success" append-icon="mdi-refresh"
-            @click="currentPassage = null; passageHistory = []; isEnd = false;">
+            @click="currentPassage = null; passageHistory = []; isEnd = false; ratingSent = false;">
             Return to Beginning
           </v-btn>
         </v-sheet>
       </v-container>
 
       <v-container v-else @keyup.left="prevPassage" @keyup.right="nextPassage"
-        class="d-flex justify-center flex-column py-12 w-xxl-25 w-50">
+        class="d-flex justify-center flex-column py-12 w-xxl-25 w-xl-50 w-lg-50 w-md-75 w-sm-100 w-xs-100">
         <div class="nav-buttons align-self-start"
           style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 16px;">
           <v-icon-btn icon="mdi-arrow-left" variant="tonal" @click="prevPassage"

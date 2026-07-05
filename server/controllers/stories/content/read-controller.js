@@ -40,6 +40,7 @@ async function getReadStoryContent(req, res) {
 
     return res.status(200).json({
       metadata: {
+        story_id: story.id,
         author: authorName,
         title: story.story_title,
         start_passage: story.start_passage_id,

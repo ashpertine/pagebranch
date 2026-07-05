@@ -2,15 +2,19 @@
 import { ref } from "vue";
 import { createDeleteStoryRequest } from "../../api/stories-api.js";
 import { useRouter } from "vue-router";
+import { useRatings } from "../../composables/ratings.js";
+
+const { addNewRating } = useRatings();
 
 const errorMsg = ref("");
 const router = useRouter();
 
 const rating = ref(3); // default rating
 const ratingDesc = ref("");
+const ratingForm = ref();
 
 const emit = defineEmits(["rating-sent", "close-rating-dialog"]);
-const props = defineProps(["globalUserId", "viewUserId"]);
+const props = defineProps(["storyId", "globalUserId", "viewUserId"]);
 
 const ratingDescRules = [
   value => {
@@ -18,6 +22,18 @@ const ratingDescRules = [
     return true;
   }
 ]
+
+async function verifyAndSubmit() {
+  const { valid } = await ratingForm.value.validate();
+  if (!valid) { // not valid...
+    return;
+  }
+
+  await addNewRating(props.storyId, rating.value, ratingDesc.value);
+  emit('rating-sent');
+  emit('close-rating-dialog');
+}
+
 </script>
 <template>
   <v-dialog max-width="500">
@@ -26,14 +42,14 @@ const ratingDescRules = [
       <v-card-subtitle>Give this story a rating out of 5 stars</v-card-subtitle>
       <div class="text-title-medium text-red-lighten-2 pb-4 px-5 rounded-md" v-if="errorMsg.length !== 0"> {{ errorMsg
       }}</div>
-      <v-form class="px-5">
+      <v-form class="px-5" ref="ratingForm" @submit.prevent="verifyAndSubmit">
         <v-rating hover :length="5" size="50" v-model="rating" active-color="orange-lighten-1"
           color="orange-lighten-1" />
         <v-textarea label="Description (optional, max 1000 characters)" :rules="ratingDescRules" v-model="ratingDesc"
           variant="solo-filled" no-resize></v-textarea>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn text="Submit" color="success" size="large" @click="$emit('close-rating-dialog')"></v-btn>
+          <v-btn text="Submit" color="success" size="large" @click="verifyAndSubmit"></v-btn>
           <v-btn text="Close" color="primary" size="large" @click="$emit('close-rating-dialog')"></v-btn>
         </v-card-actions>
       </v-form>

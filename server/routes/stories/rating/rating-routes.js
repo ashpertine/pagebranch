@@ -6,10 +6,6 @@ import { Router } from "express";
 const ratingRouter = Router();
 
 ratingRouter.get("/:storyId", ratingController.getRatings);
-ratingRouter.post(
-  "/new/:storyId",
-  checkAuthenticated,
-  ratingController.postNewRating,
-);
+ratingRouter.post("/new", checkAuthenticated, ratingController.postNewRating);
 
 export { ratingRouter };
