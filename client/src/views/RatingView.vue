@@ -5,6 +5,7 @@ import AppBar from '@/components/AppBar.vue';
 import { createGetRatingsRequest } from '@/api/rating-api';
 import { createGetStoryInfoRequest } from "@/api/stories-api";
 import { useRatings } from '@/composables/ratings';
+import UserRatingCard from "@/components/rating/UserRatingCard.vue";
 
 const { getRatings, ratingContent, ratings, ratingsAvg, ratingsCount } = useRatings();
 const route = useRoute();
@@ -48,25 +49,9 @@ const updatedAtFormatted = computed(() => {
   });
 });
 
-function formatRatingSubmitDate(date_str) {
-  const newDate = new Date(date_str);
-  return newDate.toLocaleString("en-SG", {
-    year: "numeric",
-    month: "numeric",
-    day: "numeric",
-  });
-}
-
-function formatRatingDescription(description) {
-  const maxLength = 38
-  const formattedDescription = description.length > maxLength ? description.slice(0, maxLength) + '...' : description;
-
-  return formattedDescription
-}
-
 onMounted(async () => {
   const initStoryInfo = await getStoryInfo();
-  storyInfo.value = initStoryInfo;
+  storyInfo.value = initStoryInfo.results;
 
   // get ratings only after settings readContent
   const initRatingsContent = await getRatings(route.params.storyId);
@@ -76,11 +61,11 @@ onMounted(async () => {
 </script>
 <template>
   <v-app>
-    <AppBar @stories-updated="" bar-title="Ratings" />
+    <AppBar @stories-updated="" bar-title="Ratings" v-if="ratingContent.is_logged_in" />
     <v-main>
       <v-container class="d-flex justify-center">
         <v-card class="w-100 pa-6" rounded="lg">
-          <v-card-title class="text-headline-large font-weight-light text-center">
+          <v-card-title class="text-headline-large font-weight-bold text-center">
             {{ storyInfo.story_title }}
           </v-card-title>
 
@@ -103,13 +88,8 @@ onMounted(async () => {
       <v-container>
         <v-row density="comfortable">
           <v-col v-for="ratingObj in ratingContent.results" xl="3" lg="4" md="6" cols="12" :key="ratingObj.id">
-            <v-card class="d-flex flex-column align-center">
-              <v-rating :model-value="ratingObj.rating" color="orange-lighten-1" readonly></v-rating>
-              <v-card-subtitle>
-                from {{ ratingObj.from_user_name }} (Submitted: {{ formatRatingSubmitDate(ratingObj.created_at) }})
-              </v-card-subtitle>
-              <v-card-text>{{ formatRatingDescription(ratingObj.description) }}</v-card-text>
-            </v-card>
+            <UserRatingCard :rating="ratingObj.rating" :description="ratingObj.description"
+              :from-user-name="ratingObj.from_user_name" :created-at="ratingObj.created_at" />
           </v-col>
         </v-row>
       </v-container>

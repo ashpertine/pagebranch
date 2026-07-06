@@ -1,5 +1,6 @@
 import { pbPool } from "../../db/pool.js";
 import storyHelperQueries from "./story-helper-queries.js";
+import { storyOwnerCheck } from "../role-queries.js";
 
 async function formatTitleAndSlug(story_title, user_id, add_copy_text = true) {
   const existingStories = await getStoriesByTitle(story_title, user_id);
@@ -25,10 +26,28 @@ async function getStoriesByTitle(story_title, user_id) {
   return rows;
 }
 
-async function getStoryById(story_id, user_id) {
-  const SQL = `SELECT * FROM stories WHERE id =  $1 AND author_id = $2`;
-  const { rows } = await pbPool.query(SQL, [story_id, user_id]);
-  return rows[0];
+// Checks will be used here because checkAuthenticated is disabled for app purposes
+async function getStoryById(story_id, from_user_id) {
+  const isStoryPrivate = (
+    await pbPool.query("SELECT is_private FROM stories WHERE id = $1", [
+      story_id,
+    ])
+  ).rows[0].is_private;
+
+  const isOwner =
+    from_user_id === null
+      ? false
+      : await storyOwnerCheck(from_user_id, story_id);
+
+  if (isStoryPrivate && !isOwner) {
+    return {
+      queryError: "story not found!",
+      code: 404,
+    };
+  }
+  const SQL = `SELECT * FROM stories WHERE id =  $1`;
+  const { rows } = await pbPool.query(SQL, [story_id]);
+  return rows;
 }
 
 async function getAuthorNameById(user_id) {

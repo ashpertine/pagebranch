@@ -32,11 +32,7 @@ storyRouter.get(
   storyController.getStoryContent,
 );
 
-storyRouter.get(
-  "/info/:storyId",
-  checkAuthenticated,
-  storyController.getUserStoryById,
-);
+storyRouter.get("/info/:storyId", storyController.getUserStoryById);
 
 storyRouter.patch(
   "/:storyId/pin",

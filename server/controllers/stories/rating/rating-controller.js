@@ -30,18 +30,24 @@ async function postNewRating(req, res) {
 
 async function getRatings(req, res) {
   try {
-    const userId = req.session.passport ? req.session.passport.user : null;
-    const isLoggedIn = userId !== null ? true : false;
+    const fromUserId = req.session.passport ? req.session.passport.user : null;
+    const isLoggedIn = fromUserId !== null ? true : false;
     const storyId = req.params.storyId;
 
     const results = await ratingQueries.getRatingsByStoryId(
       storyId,
-      isLoggedIn,
+      fromUserId,
     );
 
+    if (results.queryError) {
+      return res.status(results.code).json({
+        errorMsg: results.queryError,
+      });
+    }
+
     const hasSubmittedRating =
-      userId !== null
-        ? await ratingQueries.getHasSubmittedRating(storyId, userId)
+      fromUserId !== null
+        ? await ratingQueries.getHasSubmittedRating(storyId, fromUserId)
         : false;
 
     return res.status(200).json({

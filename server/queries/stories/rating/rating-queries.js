@@ -1,5 +1,5 @@
 import { pbPool } from "../../../db/pool.js";
-
+import { storyOwnerCheck } from "../../role-queries.js";
 async function insertNewRating(story_id, user_id, rating, description) {
   const isOwner = (
     await pbPool.query(
@@ -30,12 +30,30 @@ async function insertNewRating(story_id, user_id, rating, description) {
   return rows;
 }
 
-async function getRatingsByStoryId(story_id, is_logged_in) {
-  const selectCols = is_logged_in
-    ? "story_id, rating, description, users.username AS from_user_name, from_user_id, created_at"
-    : "rating";
-  const SQL = `SELECT ${selectCols} FROM ratings LEFT JOIN users ON ratings.from_user_id = users.id WHERE story_id = $1`;
-  const { rows } = await pbPool.query(SQL, [story_id]);
+async function getRatingsByStoryId(story_id, from_user_id) {
+  const isStoryPrivate = (
+    await pbPool.query("SELECT is_private FROM stories WHERE id = $1", [
+      story_id,
+    ])
+  ).rows[0].is_private;
+
+  const isOwner =
+    from_user_id === null
+      ? false
+      : await storyOwnerCheck(from_user_id, story_id);
+
+  if (isStoryPrivate && !isOwner) {
+    return {
+      queryError: "story not found!",
+      code: 404,
+    };
+  }
+
+  const { rows } = await pbPool.query(
+    `SELECT story_id, rating, description, users.username AS from_user_name, from_user_id, created_at FROM ratings LEFT JOIN users ON ratings.from_user_id = users.id WHERE story_id = $1`,
+    [story_id],
+  );
+
   return rows;
 }
 

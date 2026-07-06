@@ -142,7 +142,7 @@ onMounted(async () => {
           </div>
 
           <div class="d-flex flex-column align-center ga-4 text-center">
-            <div class="text-display-medium font-weight-light">{{ readContent.metadata.title }}</div>
+            <div class="text-display-medium font-weight-semibold">{{ readContent.metadata.title }}</div>
             <v-divider class="w-25" />
             <div class="text-headline-medium text-medium-emphasis">by {{ readContent.metadata.author }}</div>
           </div>
@@ -160,7 +160,8 @@ onMounted(async () => {
           height="520">
           <v-icon icon="mdi-book-open-variant" size="48" color="primary" />
           <div class="d-flex flex-column align-center ga-4 text-center">
-            <div class="text-display-medium font-weight-light">You have reached the end of the story.</div>
+            <div class="text-display-small font-weight-bold text-medium-emphasis">You have reached the end of the
+              story.</div>
             <v-divider class="w-25" v-if="Number(globalUserId) !== Number(route.params.userId)" />
 
             <v-btn color="success" variant="tonal" size="large" append-icon="mdi-check-circle" @click.prevent=""

@@ -47,19 +47,22 @@ async function getUserStories(req, res) {
   }
 }
 
+// Checks will be used here because checkAuthenticated is disabled for app purposes
 async function getUserStoryById(req, res) {
   try {
-    const userId = req.session.passport.user;
+    const userId = req.session.passport ? req.session.passport.user : null;
     const storyId = req.params.storyId;
     const results = await storyQueries.getStoryById(storyId, userId);
 
-    if (results.length === 0) {
-      return res.status(404).json({
-        errorMsg: "Story not found!",
+    if (results.queryError) {
+      return res.status(results.code).json({
+        errorMsg: results.queryError,
       });
     }
 
-    return res.status(200).json(results);
+    return res.status(200).json({
+      results: results[0],
+    });
   } catch (error) {
     console.error(error);
     return res.status(500).json({

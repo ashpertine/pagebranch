@@ -5,11 +5,11 @@ import storyQueries from "../../../queries/stories/story-queries.js";
 async function getReadStoryContent(req, res) {
   try {
     const userId = req.session.passport ? req.session.passport.user : null;
-    const viewUserId = req.params.userId;
+    const authorId = req.params.userId;
     const shareSlug = req.params.shareSlug;
 
     const story = (
-      await storyQueries.getStoryByUserAndSlug(viewUserId, shareSlug)
+      await storyQueries.getStoryByUserAndSlug(authorId, shareSlug)
     )[0];
 
     if (!story) {
@@ -26,15 +26,15 @@ async function getReadStoryContent(req, res) {
     }
 
     const storyId = story.id;
-    const authorName = (await storyQueries.getAuthorNameById(viewUserId))[0]
+    const authorName = (await storyQueries.getAuthorNameById(authorId))[0]
       .username;
 
     const passagesResults = await passageQueries.getPassagesByStoryId(
-      viewUserId,
+      authorId,
       storyId,
     );
     const choicesResults = await choiceQueries.getChoicesByStoryId(
-      viewUserId,
+      authorId,
       storyId,
     );
 
@@ -44,7 +44,7 @@ async function getReadStoryContent(req, res) {
         author: authorName,
         title: story.story_title,
         start_passage: story.start_passage_id,
-        is_owner: userId ? Number(userId) === Number(viewUserId) : false,
+        is_owner: userId ? Number(userId) === Number(authorId) : false,
       },
       passages: passagesResults,
       choices: choicesResults,

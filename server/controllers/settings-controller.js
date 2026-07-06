@@ -29,7 +29,7 @@ async function updateSettings(req, res) {
 async function getSettings(req, res) {
   try {
     if (!req.isAuthenticated()) {
-      return res.status(401).json({
+      return res.status(200).json({
         errorMsg: "user not authorized!",
         default: {},
       });

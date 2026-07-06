@@ -63,7 +63,7 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, from) => {
-  if (to.name === "ReadingPage") {
+  if (to.name === "ReadingPage" || to.name === "RatingsPage") {
     return true;
   }
 
