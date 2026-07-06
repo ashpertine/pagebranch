@@ -36,7 +36,7 @@ const currentContent = computed(() => {
   if (currentPassage.value === null) {
     return null;
   }
-  const choiceOptions = readContent.value.choices.filter(choice => choice.from_passage_id === currentPassage.value.id);
+  const choiceOptions = readContent.value.choices.filter(choice => choice.from_passage_id === currentPassage.value.id).sort((a, b) => a.sort_order - b.sort_order);
 
   return {
     title: currentPassage.value.title,
