@@ -32,4 +32,21 @@ async function createGetRatingsRequest(story_id) {
   }
 }
 
-export { createPostRatingsRequest, createGetRatingsRequest };
+async function createGetTotalRatingStatRequest() {
+  try {
+    const response = await fetch(`/api/rating/user/stats`, {
+      method: "GET",
+    });
+    return response;
+  } catch (error) {
+    return {
+      responseErr: "Server error. Please try again later" + error.toString(),
+    };
+  }
+}
+
+export {
+  createPostRatingsRequest,
+  createGetRatingsRequest,
+  createGetTotalRatingStatRequest,
+};

@@ -7,5 +7,10 @@ const ratingRouter = Router();
 
 ratingRouter.get("/:storyId", ratingController.getRatings);
 ratingRouter.post("/new", checkAuthenticated, ratingController.postNewRating);
+ratingRouter.get(
+  "/user/stats",
+  checkAuthenticated,
+  ratingController.getTotalRatingStat,
+);
 
 export { ratingRouter };

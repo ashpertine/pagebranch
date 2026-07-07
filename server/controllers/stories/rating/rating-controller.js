@@ -63,7 +63,23 @@ async function getRatings(req, res) {
   }
 }
 
+async function getTotalRatingStat(req, res) {
+  try {
+    const userId = req.session.passport.user;
+    const results = await ratingQueries.getTotalRatingsByUser(userId);
+    return res.status(200).json({
+      results,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      errorMsg: error.toString(),
+    });
+  }
+}
+
 export default {
   postNewRating,
   getRatings,
+  getTotalRatingStat,
 };

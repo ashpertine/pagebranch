@@ -65,8 +65,16 @@ async function getHasSubmittedRating(story_id, user_id) {
   return hasSubmittedRating;
 }
 
+async function getTotalRatingsByUser(user_id) {
+  const SQL = `SELECT ratings.rating FROM ratings LEFT JOIN stories ON ratings.story_id = stories.id LEFT JOIN users ON stories.author_id = users.id WHERE users.id = $1`;
+
+  const { rows } = await pbPool.query(SQL, [user_id]);
+  return rows;
+}
+
 export default {
   insertNewRating,
   getRatingsByStoryId,
   getHasSubmittedRating,
+  getTotalRatingsByUser,
 };
