@@ -2,12 +2,22 @@ import { pbPool } from "../../db/pool.js";
 import storyHelperQueries from "./story-helper-queries.js";
 import { storyOwnerCheck } from "../role-queries.js";
 
-async function formatTitleAndSlug(story_title, user_id, add_copy_text = true) {
+async function formatTitleAndSlug(story_title, user_id) {
   const existingStories = await getStoriesByTitle(story_title, user_id);
-  const storyTitleFormatted =
-    existingStories.length > 0 && add_copy_text
-      ? `Copy of ${story_title}`
-      : story_title;
+  const prependedTextResult = (
+    await pbPool.query(
+      "SELECT preferences->>'default_prepended_text' AS default_prepended_text FROM settings WHERE user_id = $1",
+      [user_id],
+    )
+  ).rows[0].default_prepended_text;
+
+  const prependedText =
+    prependedTextResult === null ? "Copy of" : prependedTextResult;
+
+  const storyTitleFormatted = (
+    existingStories.length > 0 ? `${prependedText} ${story_title}` : story_title
+  ).trim();
+
   const existingSlugs = existingStories.map((story) => story.share_slug);
   let shareSlug = story_title.toLowerCase().split(" ").join("-");
   if (existingSlugs.includes(shareSlug)) {

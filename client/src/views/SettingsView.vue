@@ -5,7 +5,7 @@ import LogoutButton from "@/components/auth/LogoutButton.vue";
 import { useTheme } from "vuetify";
 import { Debounce } from "../composables/debounce";
 import { useSettings } from "../composables/settings.js";
-const { saveUpdateSettings, localSettings, defaultNodePosition } = useSettings();
+const { saveUpdateSettings, localSettings, defaultNodePosition, defaultPrependedText } = useSettings();
 const theme = useTheme();
 
 const themes = ['system', 'dark', 'light'];
@@ -18,6 +18,7 @@ async function changeTheme(variant) {
 }
 
 const nodePosForm = ref();
+const prependedTextForm = ref();
 const nodePosRules = [
   value => {
     if (Number(value) > 1000) return 'Invalid value';
@@ -40,16 +41,29 @@ const defaultPos = ref({
   Y: defaultNodePosition
 })
 
+const prependText = ref(defaultPrependedText);
+
 async function setDefaultNodePos() {
+  const { valid } = await nodePosForm.value.validate();
+  if (!valid) return;
+
   Debounce.cancelDebounce();
   localSettings.value.default_pos_x = defaultPos.value.X === "" ? defaultNodePosition : Number(defaultPos.value.X);
   localSettings.value.default_pos_y = defaultPos.value.Y === "" ? defaultNodePosition : Number(defaultPos.value.Y);
   Debounce.saveDebounce(500, async () => await saveUpdateSettings());
 }
 
+async function setDefaultPrependedText() {
+  Debounce.cancelDebounce();
+  localSettings.value.default_prepended_text = prependText.value;
+  Debounce.saveDebounce(500, async () => await saveUpdateSettings());
+}
+
 onMounted(() => {
   defaultPos.value.X = localSettings.value.default_pos_x ?? defaultNodePosition;
   defaultPos.value.Y = localSettings.value.default_pos_y ?? defaultNodePosition;
+
+  prependText.value = localSettings.value.default_prepended_text ?? defaultPrependedText;
 })
 
 </script>
@@ -75,6 +89,14 @@ onMounted(() => {
                 v-model="defaultPos.Y"></v-text-field>
             </v-col>
           </v-row>
+        </v-form>
+
+        <div class="text-title-medium text-medium-emphasis">Default prepended text for duplicate stories</div>
+        <div class="text-body-medium text-medium-emphasis pb-4">Set the default text that is prepended
+          when making a story with the same name as an existing story. Optionally, you can leave this blank.
+        </div>
+        <v-form ref="prependedTextForm" @keyup="setDefaultPrependedText">
+          <v-text-field label="Text" v-model="prependText"></v-text-field>
         </v-form>
         <LogoutButton />
       </v-container>

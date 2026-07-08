@@ -9,6 +9,7 @@ import { useRouter } from "vue-router";
 const localSettings = ref({});
 const globalUserId = ref(null);
 const defaultNodePosition = 150;
+const defaultPrependedText = "Copy of";
 function useSettings() {
   const router = useRouter();
 
@@ -49,6 +50,7 @@ function useSettings() {
     globalUserId,
     storeCurrentUser,
     defaultNodePosition,
+    defaultPrependedText,
   };
 }
 
