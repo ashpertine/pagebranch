@@ -159,11 +159,11 @@ watch(() => props.choicesList, (newVal) => {
                 <v-list-item-title>Header 2</v-list-item-title>
               </v-list-item>
 
-              <v-list-item prepend-icon="mdi-format-bold">
+              <v-list-item prepend-icon="mdi-format-bold" @click="surroundMd('**')">
                 <v-list-item-title>Bold</v-list-item-title>
               </v-list-item>
 
-              <v-list-item prepend-icon="mdi-format-italic">
+              <v-list-item prepend-icon="mdi-format-italic" @click="surroundMd('*')">
                 <v-list-item-title>Italic</v-list-item-title>
               </v-list-item>
 
