@@ -35,11 +35,6 @@ const data = computed(() => {
   return result;
 })
 
-onMounted(() => {
-  console.log(data.value);
-})
-
-
 const option = computed(() => ({
   backgroundColor: 'transparent',
   title: {

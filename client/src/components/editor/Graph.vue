@@ -240,7 +240,7 @@ function updateChoiceSortOrder(propData) {
       <ChoiceEdge v-bind="props" />
     </template>
     <Panel>
-      <v-container class="d-flex ga-4">
+      <v-container class="d-flex ga-4 flex-wrap">
         <v-btn type="button" @click="addNode" color="primary" icon="mdi-plus">
         </v-btn>
         <v-dialog max-width="500">

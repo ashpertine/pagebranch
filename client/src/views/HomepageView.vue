@@ -60,8 +60,6 @@ const exactTheme = computed(() => {
 onMounted(async () => {
   await getStories();
   await getTotalStats();
-  console.log(stories.value);
-  console.log(ratingTotalStats.value);
 })
 
 </script>

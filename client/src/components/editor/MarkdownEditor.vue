@@ -22,9 +22,33 @@ function insertMd(md) {
 
   editor.focus();
   editor.selectionEnd = posEnd + fullMd.length;
+
+  sendContentUpdate();
+}
+
+function surroundMd(md) {
+  const editor = document.querySelector('.pb-editor');
+  const posStart = editor.selectionStart;
+  const posEnd = editor.selectionEnd;
+  const newInnerText = editor.value.slice(0, posStart) + md + editor.value.slice(posStart) + md;
+  editor.value = newInnerText;
+
+  editor.focus();
+  editor.selectionEnd = posEnd + md.length;
+
+  sendContentUpdate();
 }
 
 const { name } = useDisplay()
+const isMobile = computed(() => {
+  switch (name.value) {
+    case 'xs': return true;
+    case 'sm': return true;
+  }
+
+  return false;
+})
+
 const editorWidth = computed(() => {
   if (props.editorSize === 'expandedSize') {
     switch (name.value) {
@@ -108,16 +132,47 @@ watch(() => props.choicesList, (newVal) => {
       <v-toolbar-title>
         <v-btn icon="mdi-window-close" variant="text" @click="emit('toggle-view')"></v-btn>
         <v-btn icon="mdi-fullscreen" variant="text" @click="emit('toggle-expand')"></v-btn>
-        <div v-if="tab === 'main'" style="display: inline;">
+        <div v-if="tab === 'main' && !isMobile" style="display: inline;">
           <v-btn icon="mdi-format-header-1" @click="insertMd('#')" variant="text" :disabled="editorButtonsDisabled">
           </v-btn>
           <v-btn icon="mdi-format-header-2" @click="insertMd('##')" variant="text" :disabled="editorButtonsDisabled">
           </v-btn>
-          <v-btn icon="mdi-format-bold"></v-btn>
-          <v-btn icon="mdi-format-italic"></v-btn>
+          <v-btn icon="mdi-format-bold" :disabled="editorButtonsDisabled" @click="surroundMd('**')"></v-btn>
+          <v-btn icon="mdi-format-italic" :disabled="editorButtonsDisabled" @click="surroundMd('*')"></v-btn>
           <v-btn icon="mdi-format-list-bulleted" @click="insertMd('-')" variant="text"
             :disabled="editorButtonsDisabled">
           </v-btn>
+        </div>
+        <div v-else-if="tab === 'main' && isMobile" style="display: inline;">
+          <v-menu>
+            <template v-slot:activator="{ props }">
+              <v-btn variant="text" v-bind="props">
+                Format
+              </v-btn>
+            </template>
+            <v-list>
+              <v-list-item prepend-icon="mdi-format-header-1" @click="insertMd('#')">
+                <v-list-item-title>Header 1</v-list-item-title>
+              </v-list-item>
+
+              <v-list-item prepend-icon="mdi-format-header-2" @click="insertMd('##')">
+                <v-list-item-title>Header 2</v-list-item-title>
+              </v-list-item>
+
+              <v-list-item prepend-icon="mdi-format-bold">
+                <v-list-item-title>Bold</v-list-item-title>
+              </v-list-item>
+
+              <v-list-item prepend-icon="mdi-format-italic">
+                <v-list-item-title>Italic</v-list-item-title>
+              </v-list-item>
+
+              <v-list-item prepend-icon="mdi-format-list-bulleted" @click="insertMd('-')">
+                <v-list-item-title>Bulleted List</v-list-item-title>
+              </v-list-item>
+
+            </v-list>
+          </v-menu>
         </div>
       </v-toolbar-title>
     </v-toolbar>
