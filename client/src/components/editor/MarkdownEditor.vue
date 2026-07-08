@@ -104,23 +104,28 @@ watch(() => props.choicesList, (newVal) => {
 </script>
 <template>
   <v-sheet class="custom-markdown-editor" border rounded :elevation="4" :class="[editorWidth, editorHeight]">
-    <v-toolbar>
-      <v-toolbar-title v-if="tab === 'main'">
-        <v-btn icon="mdi-format-header-1" @click="insertMd('#')" variant="text" :disabled="editorButtonsDisabled">
-        </v-btn>
-        <v-btn icon="mdi-format-header-2" @click="insertMd('##')" variant="text" :disabled="editorButtonsDisabled">
-        </v-btn>
-        <v-btn icon="mdi-format-list-bulleted" @click="insertMd('-')" variant="text" :disabled="editorButtonsDisabled">
-        </v-btn>
+    <v-toolbar class="d-flex">
+      <v-toolbar-title>
+        <v-btn icon="mdi-window-close" variant="text" @click="emit('toggle-view')"></v-btn>
+        <v-btn icon="mdi-fullscreen" variant="text" @click="emit('toggle-expand')"></v-btn>
+        <div v-if="tab === 'main'" style="display: inline;">
+          <v-btn icon="mdi-format-header-1" @click="insertMd('#')" variant="text" :disabled="editorButtonsDisabled">
+          </v-btn>
+          <v-btn icon="mdi-format-header-2" @click="insertMd('##')" variant="text" :disabled="editorButtonsDisabled">
+          </v-btn>
+          <v-btn icon="mdi-format-bold"></v-btn>
+          <v-btn icon="mdi-format-italic"></v-btn>
+          <v-btn icon="mdi-format-list-bulleted" @click="insertMd('-')" variant="text"
+            :disabled="editorButtonsDisabled">
+          </v-btn>
+        </div>
       </v-toolbar-title>
-      <v-btn icon="mdi-fullscreen" variant="text" @click="emit('toggle-expand')"></v-btn>
-      <v-btn icon="mdi-window-close" variant="text" @click="emit('toggle-view')"></v-btn>
     </v-toolbar>
 
     <v-tabs v-model="tab" color="blue" fixed-tabs>
       <v-tab value="main">Editor</v-tab>
       <v-tab value="preview">Preview</v-tab>
-      <v-tab value="reorder">Reorder Choices</v-tab>
+      <v-tab value="reorder">Choices</v-tab>
     </v-tabs>
     <v-divider></v-divider>
     <v-tabs-window v-model="tab">

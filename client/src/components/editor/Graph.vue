@@ -9,7 +9,7 @@ import { useVueFlow, VueFlow, Panel, Position } from '@vue-flow/core';
 import { useSettings } from "../../composables/settings.js";
 import { Debounce } from '../../composables/debounce.js';
 
-const { onNodeClick, onNodeDragStop, onNodeDragStart, onEdgeDoubleClick } = useVueFlow();
+const { onNodeClick, onNodeDragStop, onNodeDragStart, onEdgeClick } = useVueFlow();
 const props = defineProps(["story-content", "editor-selected-passage", "start-passage"]);
 const emit = defineEmits([
   "create-new-passage",
@@ -166,7 +166,7 @@ const choiceDialogData = ref({
 
 const labelForm = ref();
 
-onEdgeDoubleClick((event) => {
+onEdgeClick((event) => {
   choiceDialogData.value.selected = Number(event.edge.id);
   choiceDialog.value = true;
 })
@@ -210,8 +210,8 @@ function updateChoiceSortOrder(propData) {
 
 </script>
 <template>
-  <v-dialog v-model="choiceDialog" width="auto" @after-leave="hideChoiceDialog">
-    <v-card prepend-icon="mdi-note-edit" class="px-4 py-4" min-width="600">
+  <v-dialog v-model="choiceDialog" max-width="500" @after-leave="hideChoiceDialog">
+    <v-card prepend-icon="mdi-note-edit" class="px-4 py-4">
       <v-card-title>Modify Choice</v-card-title>
       <v-card-subtitle>Change or delete this label</v-card-subtitle>
       <v-container>
@@ -251,7 +251,7 @@ function updateChoiceSortOrder(propData) {
             </v-btn>
           </template>
           <template v-slot:default="{ isActive }">
-            <v-card title="Delete Passage">
+            <v-card title="Delete Passage" class="px-4 py-4">
               <v-card-text>
                 Are you sure you want to delete this passage? This action is irreversible.
               </v-card-text>
