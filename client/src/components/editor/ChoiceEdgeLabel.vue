@@ -12,12 +12,12 @@ const props = defineProps({
   {{ props.label }}
 </template>
 <style>
-.vue-flow__edge-text {
+.vue-flow__edge-textwrapper .vue-flow__edge-text {
   fill: white !important;
   font-size: 0.9rem !important;
 }
 
-.vue-flow__edge-textbg {
+.vue-flow__edge-textwrapper .vue-flow__edge-textbg {
   fill: #37474F !important;
 }
 </style>

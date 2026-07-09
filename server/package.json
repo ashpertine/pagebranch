@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "initDb": "node --env-file=../.env db/populate-db.js",
-    "dev": "node --watch --env-file=../.env app.js"
+    "dev": "node --watch --env-file=../.env app.js",
+    "prod": "NODE_ENV=prod node app.js"
   },
   "keywords": [],
   "author": "",
@@ -15,7 +16,6 @@
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "connect-pg-simple": "^10.0.0",
-    "cors": "^2.8.6",
     "express": "^5.2.1",
     "express-session": "^1.19.0",
     "express-validator": "^7.3.2",
