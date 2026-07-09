@@ -48,7 +48,7 @@ async function verifyAndSubmit() {
 <template>
   <v-card class="w-xxl-25 w-xl-50 w-lg-50 w-100 px-10 py-10">
     <v-container class="d-flex flex-column align-center">
-      <v-img :width="100" aspect-ratio="1/1" src="pagebranch_optimized.svg"></v-img>
+      <v-img :width="100" aspect-ratio="1/1" src="public/pagebranch_optimized.svg"></v-img>
       <v-card-title>Register</v-card-title>
       <v-card-subtitle>Welcome to pagebranch!</v-card-subtitle>
     </v-container>
