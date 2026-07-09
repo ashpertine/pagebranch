@@ -239,8 +239,8 @@ function updateChoiceSortOrder(propData) {
     <template #edge-choice="props">
       <ChoiceEdge v-bind="props" />
     </template>
-    <Panel>
-      <v-container class="d-flex ga-4 flex-wrap">
+    <Panel style="pointer-events: none;">
+      <v-container class="d-flex ga-4 flex-wrap panel-buttons-container">
         <v-btn type="button" @click="addNode" color="primary" icon="mdi-plus">
         </v-btn>
         <v-dialog max-width="500">
@@ -264,8 +264,8 @@ function updateChoiceSortOrder(propData) {
             </v-card>
           </template>
         </v-dialog>
-        <v-btn v-if="elligbleForSetStart" type="button" color="success" text="Set Start Passage"
-          @click="setStartingPassage" size="large"></v-btn>
+        <v-btn v-if="elligbleForSetStart" type="button" color="success" text="Set Start" @click="setStartingPassage"
+          size="large"></v-btn>
       </v-container>
     </Panel>
   </VueFlow>
@@ -279,5 +279,10 @@ function updateChoiceSortOrder(propData) {
 </template>
 <style>
 @import '@vue-flow/core/dist/style.css';
-@import '@vue-flow/core/dist/theme-default.css'
+@import '@vue-flow/core/dist/theme-default.css';
+
+
+.panel-buttons-container * {
+  pointer-events: all;
+}
 </style>

@@ -133,14 +133,16 @@ onMounted(async () => {
         <v-sheet :elevation="2" rounded="lg"
           class="w-lg-50 w-md-75 w-sm-100 w-100 d-flex flex-column align-center justify-space-between pa-12"
           height="520">
-          <v-rating hover :length="5" size="50" active-color="orange-lighten-1" color="orange-lighten-1" readonly
-            half-increments :model-value="ratingsAvg" />
-          <div class="d-flex flex-column align-center">
-            <v-icon icon="mdi-book-open-variant" size="48" color="primary" />
-            <div class="text-headline-small text-medium-emphasis">Rating: {{ ratingsAvg }} ({{ ratingsCount }} ratings)
+          <v-icon icon="mdi-book-open-variant" size="48" color="primary" />
+          <div class="d-flex ga-2 flex-wrap justify-center">
+            <v-rating hover :length="5" size="32" active-color="orange-lighten-1" color="orange-lighten-1" readonly
+              half-increments :model-value="ratingsAvg" />
+            <div class="text-headline-small text-medium-emphasis">{{ ratingsAvg }} ({{ ratingsCount }}
+              ratings)
             </div>
+            <v-btn variant="text" color="info"
+              @click="$router.push({ path: `/rating/${readContent.metadata.story_id}` })">View all</v-btn>
           </div>
-
           <div class="d-flex flex-column align-center ga-4 text-center">
             <div class="text-display-medium font-weight-semibold">{{ readContent.metadata.title }}</div>
             <v-divider class="w-25" />

@@ -30,7 +30,7 @@ function surroundMd(md) {
   const editor = document.querySelector('.pb-editor');
   const posStart = editor.selectionStart;
   const posEnd = editor.selectionEnd;
-  const newInnerText = editor.value.slice(0, posStart) + md + editor.value.slice(posStart) + md;
+  const newInnerText = editor.value.slice(0, posStart) + md + editor.value.slice(posStart, posEnd) + md + editor.value.slice(posEnd, editor.value.length + 1);
   editor.value = newInnerText;
 
   editor.focus();
