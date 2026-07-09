@@ -40,15 +40,6 @@ function surroundMd(md) {
 }
 
 const { name } = useDisplay()
-const isMobile = computed(() => {
-  switch (name.value) {
-    case 'xs': return true;
-    case 'sm': return true;
-  }
-
-  return false;
-})
-
 const editorWidth = computed(() => {
   if (props.editorSize === 'expandedSize') {
     switch (name.value) {
@@ -128,51 +119,11 @@ watch(() => props.choicesList, (newVal) => {
 </script>
 <template>
   <v-sheet class="custom-markdown-editor" border rounded :elevation="4" :class="[editorWidth, editorHeight]">
-    <v-toolbar class="d-flex">
+    <v-toolbar>
       <v-toolbar-title>
         <v-btn icon="mdi-window-close" variant="text" @click="emit('toggle-view')"></v-btn>
         <v-btn icon="mdi-fullscreen" variant="text" @click="emit('toggle-expand')"></v-btn>
-        <div v-if="tab === 'main' && !isMobile" style="display: inline;">
-          <v-btn icon="mdi-format-header-1" @click="insertMd('#')" variant="text" :disabled="editorButtonsDisabled">
-          </v-btn>
-          <v-btn icon="mdi-format-header-2" @click="insertMd('##')" variant="text" :disabled="editorButtonsDisabled">
-          </v-btn>
-          <v-btn icon="mdi-format-bold" :disabled="editorButtonsDisabled" @click="surroundMd('**')"></v-btn>
-          <v-btn icon="mdi-format-italic" :disabled="editorButtonsDisabled" @click="surroundMd('*')"></v-btn>
-          <v-btn icon="mdi-format-list-bulleted" @click="insertMd('-')" variant="text"
-            :disabled="editorButtonsDisabled">
-          </v-btn>
-        </div>
-        <div v-else-if="tab === 'main' && isMobile" style="display: inline;">
-          <v-menu>
-            <template v-slot:activator="{ props }">
-              <v-btn variant="text" v-bind="props">
-                Format
-              </v-btn>
-            </template>
-            <v-list>
-              <v-list-item prepend-icon="mdi-format-header-1" @click="insertMd('#')">
-                <v-list-item-title>Header 1</v-list-item-title>
-              </v-list-item>
-
-              <v-list-item prepend-icon="mdi-format-header-2" @click="insertMd('##')">
-                <v-list-item-title>Header 2</v-list-item-title>
-              </v-list-item>
-
-              <v-list-item prepend-icon="mdi-format-bold" @click="surroundMd('**')">
-                <v-list-item-title>Bold</v-list-item-title>
-              </v-list-item>
-
-              <v-list-item prepend-icon="mdi-format-italic" @click="surroundMd('*')">
-                <v-list-item-title>Italic</v-list-item-title>
-              </v-list-item>
-
-              <v-list-item prepend-icon="mdi-format-list-bulleted" @click="insertMd('-')">
-                <v-list-item-title>Bulleted List</v-list-item-title>
-              </v-list-item>
-
-            </v-list>
-          </v-menu>
+        <div v-if="tab === 'main'" style="display: inline;">
         </div>
       </v-toolbar-title>
     </v-toolbar>
@@ -185,6 +136,17 @@ watch(() => props.choicesList, (newVal) => {
     <v-divider></v-divider>
     <v-tabs-window v-model="tab">
       <v-tabs-window-item value="main" class="d-flex flex-column flex-grow-1">
+        <v-toolbar density="compact" class="bg-surface">
+          <v-btn icon="mdi-format-header-1" @click="insertMd('#')" variant="text" :disabled="editorButtonsDisabled">
+          </v-btn>
+          <v-btn icon="mdi-format-header-2" @click="insertMd('##')" variant="text" :disabled="editorButtonsDisabled">
+          </v-btn>
+          <v-btn icon="mdi-format-bold" :disabled="editorButtonsDisabled" @click="surroundMd('**')"></v-btn>
+          <v-btn icon="mdi-format-italic" :disabled="editorButtonsDisabled" @click="surroundMd('*')"></v-btn>
+          <v-btn icon="mdi-format-list-bulleted" @click="insertMd('-')" variant="text"
+            :disabled="editorButtonsDisabled">
+          </v-btn>
+        </v-toolbar>
         <v-container fluid>
           <h1 ref="titleEl" contenteditable="true" @focus="editorButtonsDisabled = true"
             @focusout="editorButtonsDisabled = false" @keydown.enter="(event) => event.preventDefault()"
@@ -323,6 +285,7 @@ watch(() => props.choicesList, (newVal) => {
   height: 100%;
   resize: none;
   overflow-y: scroll;
+  text-wrap: nowrap;
 }
 
 .pb-editor-seperator {
