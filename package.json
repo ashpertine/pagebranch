@@ -1,5 +1,22 @@
 {
-  "dependencies": {
-    "@vue-flow/background": "^1.3.2"
-  }
+  "name": "pagebranch",
+  "version": "1.0.0",
+  "description": "Build choose-your-own-adventure stories on a canvas.",
+  "main": "index.js",
+  "scripts": {
+    "start": "NODE_ENV=prod node server/app.js",
+    "build": "cd client && npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ashpertine/pagebranch.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/ashpertine/pagebranch/issues"
+  },
+  "homepage": "https://github.com/ashpertine/pagebranch#readme"
 }
