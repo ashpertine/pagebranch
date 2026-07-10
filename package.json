@@ -6,7 +6,7 @@
   "scripts": {
     "start": "NODE_ENV=prod node server/app.js",
     "build": "cd client && npm run build",
-    "postinstall": "cd client && npm install && cd ../server && npm install && npm run initDb"
+    "postinstall": "cd client && npm install && cd ../server && npm install && node db/populate-db.js"
   },
   "repository": {
     "type": "git",
